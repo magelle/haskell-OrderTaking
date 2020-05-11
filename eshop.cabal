@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 332418b93ff150d895e7bb93acdb6e8a5607127b49a782a82215361e99401e11
+-- hash: 04fdd1ba3504891ea53d5c53952aa4a1a24151bd5cdb6d517d3c8c835c757507
 
 name:           eshop
 version:        0.1.0.0
@@ -37,6 +37,7 @@ library
       OrderTaking.Common.String50
       OrderTaking.Common.UsStateCode
       OrderTaking.Common.VipStatus
+      OrderTaking.Common.WidgetCode
       OrderTaking.Common.ZipCode
   other-modules:
       Paths_eshop
@@ -72,6 +73,7 @@ test-suite eshop-test
       OrderTaking.Common.String50Spec
       OrderTaking.Common.UsStateCodeSpec
       OrderTaking.Common.VipStatusSpec
+      OrderTaking.Common.WidgetCodeSpec
       OrderTaking.Common.ZipCodeSpec
       Paths_eshop
   hs-source-dirs:
