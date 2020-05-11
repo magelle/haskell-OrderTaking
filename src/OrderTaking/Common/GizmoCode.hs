@@ -1,5 +1,6 @@
 module OrderTaking.Common.GizmoCode
-    ( create
+    ( GizmoCode()
+    , create
     , value
     )
 where

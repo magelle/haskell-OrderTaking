@@ -1,5 +1,6 @@
 module OrderTaking.Common.EmailAddress
-    ( create
+    ( EmailAddress()
+    , create
     , value
     )
 where

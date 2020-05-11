@@ -1,5 +1,6 @@
 module OrderTaking.Common.ZipCode
-    ( create
+    ( ZipCode()
+    , create
     , value
     )
 where

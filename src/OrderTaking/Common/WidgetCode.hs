@@ -1,5 +1,6 @@
 module OrderTaking.Common.WidgetCode
-    ( create
+    ( WidgetCode
+    , create
     , value
     )
 where

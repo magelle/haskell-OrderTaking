@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 1b87dd5946fc0fc2d4c94965196a8b545177c2b9da91a75b71513ed52d26285a
+-- hash: f13c30c16f4703932f7ebaa131879cf88102f27531bd45bd731fbee010876e91
 
 name:           eshop
 version:        0.1.0.0
@@ -33,6 +33,7 @@ library
       OrderTaking.Common.GizmoCode
       OrderTaking.Common.OrderId
       OrderTaking.Common.OrderLineId
+      OrderTaking.Common.ProductCode
       OrderTaking.Common.Regex
       OrderTaking.Common.Result
       OrderTaking.Common.String50
@@ -71,6 +72,7 @@ test-suite eshop-test
       OrderTaking.Common.GizmoCodeSpec
       OrderTaking.Common.OrderIdSpec
       OrderTaking.Common.OrderLineIdSpec
+      OrderTaking.Common.ProductCodeSpec
       OrderTaking.Common.RegexSpec
       OrderTaking.Common.String50Spec
       OrderTaking.Common.UsStateCodeSpec

@@ -1,5 +1,6 @@
 module OrderTaking.Common.UsStateCode
-    ( create
+    ( UsStateCode()
+    , create
     , value
     )
 where
