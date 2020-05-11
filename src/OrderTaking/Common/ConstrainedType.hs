@@ -1,5 +1,6 @@
 module OrderTaking.Common.ConstrainedType
     ( createString
+    , createStringOption
     )
 where
 
@@ -27,14 +28,20 @@ createString fieldName constructor maxLen str
 --     Return None if input is null, empty. 
 --     Return error if length > maxLen
 --     Return Some if the input is valid
---     let createStringOption fieldName ctor maxLen str = 
---         if String.IsNullOrEmpty(str) then
---             Ok None
---         elif str.Length > maxLen then
---             let msg = sprintf "%s must not be more than %i chars" fieldName maxLen 
---             Error msg 
---         else
---             Ok (ctor str |> Some)
+createStringOption
+    :: String -> (String -> a) -> Int -> String -> Result (Maybe a)
+createStringOption fieldName constructor maxLen str
+    | length str == 0
+    = Ok Nothing 
+    | length str > maxLen
+    = Error
+        $  fieldName
+        ++ " must not be more than "
+        ++ (show maxLen)
+        ++ " chars"
+    | otherwise
+    = Ok (Just $ constructor str)
+
 --     Create a constrained integer using the constructor provided
 --     Return Error if input is less than minVal or more than maxVal
 --     let createInt fieldName ctor minVal maxVal i = 
