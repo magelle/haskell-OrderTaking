@@ -17,4 +17,4 @@ value (EmailAddressContent str) = str
 -- Create an EmailAddress from a string
 -- Return Error if input is null, empty, or doesn't have an "@" in it
 create :: String -> String -> Result EmailAddress
-create fieldName str = createLike fieldName EmailAddressContent ".+@.+" str
+create fieldName = createLike fieldName EmailAddressContent "^.+@.+$"
