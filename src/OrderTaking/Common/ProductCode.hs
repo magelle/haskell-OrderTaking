@@ -1,5 +1,5 @@
 module OrderTaking.Common.ProductCode
-    ( ProductCode()
+    ( ProductCode(Widget, Gizmo)
     , OrderTaking.Common.ProductCode.create
     , OrderTaking.Common.ProductCode.value
     )
