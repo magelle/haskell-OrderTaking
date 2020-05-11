@@ -38,3 +38,11 @@ spec = describe "Contrained Types contructors" $ do
             createInt "myfieldName" id 1 10 0 `shouldBe` Error "myfieldName: Must not be less than 1"
         it "should refuse to create value over than bound" $
             createInt "myfieldName" id 1 10 11 `shouldBe` Error "myfieldName: Must not be greater than 10"
+
+    describe "Create a constrained Decimal" $ do
+        it "should accept to create" $
+            createDecimal "myfieldName" id 1.0 10.0 5.0 `shouldBe` Ok 5.0
+        it "should refuse to create value low than bound" $
+            createDecimal "myfieldName" id 1.0 10.0 0.0 `shouldBe` Error "myfieldName: Must not be less than 1.0"
+        it "should refuse to create value over than bound" $
+            createDecimal "myfieldName" id 1.0 10.0 11.0 `shouldBe` Error "myfieldName: Must not be greater than 10.0"

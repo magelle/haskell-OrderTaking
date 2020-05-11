@@ -1,8 +1,9 @@
 module OrderTaking.Common.ConstrainedType
     ( createString
     , createStringOption
-    , createInt
     , createLike
+    , createInt
+    , createDecimal
     )
 where
 
@@ -58,15 +59,15 @@ createInt fieldName constructor minVal maxVal i
 
 --     Create a constrained decimal using the constructor provided
 --     Return Error if input is less than minVal or more than maxVal
---     let createDecimal fieldName ctor minVal maxVal i = 
---         if i < minVal then
---             let msg = sprintf "%s: Must not be less than %M" fieldName minVal
---             Error msg
---         elif i > maxVal then
---             let msg = sprintf "%s: Must not be greater than %M" fieldName maxVal
---             Error msg
---         else
---             Ok (ctor i)
+createDecimal
+    :: String -> (Double -> a) -> Double -> Double -> Double -> Result a
+createDecimal fieldName constructor minVal maxVal i
+    | i < minVal
+    = Error $ fieldName ++ ": Must not be less than " ++ (show minVal)
+    | i > maxVal
+    = Error $ fieldName ++ ": Must not be greater than " ++ (show maxVal)
+    | otherwise
+    = Ok (constructor i)
 
 --     Create a constrained string using the constructor provided
 --     Return Error if input is null. empty, or does not match the regex pattern
