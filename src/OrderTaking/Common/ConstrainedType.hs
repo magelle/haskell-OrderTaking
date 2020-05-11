@@ -1,9 +1,11 @@
 module OrderTaking.Common.ConstrainedType
     ( createString
     , createStringOption
+    , createLike
     )
 where
 
+import           OrderTaking.Common.Regex
 import           OrderTaking.Common.Result
 
 -- ===============================
@@ -64,14 +66,20 @@ createStringOption fieldName constructor maxLen str
 --             Error msg
 --         else
 --             Ok (ctor i)
+
 --     Create a constrained string using the constructor provided
 --     Return Error if input is null. empty, or does not match the regex pattern
---     let createLike fieldName  ctor pattern str = 
---         if String.IsNullOrEmpty(str) then
---             let msg = sprintf "%s: Must not be null or empty" fieldName 
---             Error msg
---         elif System.Text.RegularExpressions.Regex.IsMatch(str,pattern) then
---             Ok (ctor str)
---         else
---             let msg = sprintf "%s: '%s' must match the pattern '%s'" fieldName str pattern
---             Error msg 
+createLike :: String -> (String -> a) -> String -> String -> Result a
+createLike fieldName constructor pattern str
+    | length str == 0
+    = Error $ fieldName ++ " must not be empty"
+    | not (matchRegex pattern str)
+    = Error
+        $  fieldName
+        ++ " : '"
+        ++ str
+        ++ "' must match the pattern '"
+        ++ pattern
+        ++ "'"
+    | otherwise
+    = Ok $ constructor str

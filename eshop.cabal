@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: c6b6861ae166b8c422db6040eef4c02d14fb92d56e085332b863f24145d5f6d6
+-- hash: 4ea77e85b7e6051ee6bb278f46eacde2ad0ee1ac547246327a7a361ad3686257
 
 name:           eshop
 version:        0.1.0.0
@@ -29,6 +29,8 @@ library
   exposed-modules:
       Lib
       OrderTaking.Common.ConstrainedType
+      OrderTaking.Common.EmailAddress
+      OrderTaking.Common.Regex
       OrderTaking.Common.Result
       OrderTaking.Common.String50
   other-modules:
@@ -37,6 +39,7 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , regex-tdfa
   default-language: Haskell2010
 
 executable eshop-exe
@@ -49,6 +52,7 @@ executable eshop-exe
   build-depends:
       base >=4.7 && <5
     , eshop
+    , regex-tdfa
   default-language: Haskell2010
 
 test-suite eshop-test
@@ -56,6 +60,8 @@ test-suite eshop-test
   main-is: Spec.hs
   other-modules:
       OrderTaking.Common.ConstrainedTypeSpec
+      OrderTaking.Common.EmailAddressSpec
+      OrderTaking.Common.RegexSpec
       OrderTaking.Common.String50Spec
       Paths_eshop
   hs-source-dirs:
@@ -65,4 +71,5 @@ test-suite eshop-test
       base >=4.7 && <5
     , eshop
     , hspec
+    , regex-tdfa
   default-language: Haskell2010
