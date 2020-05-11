@@ -1,6 +1,7 @@
 module OrderTaking.Common.ConstrainedType
     ( createString
     , createStringOption
+    , createInt
     , createLike
     )
 where
@@ -34,7 +35,7 @@ createStringOption
     :: String -> (String -> a) -> Int -> String -> Result (Maybe a)
 createStringOption fieldName constructor maxLen str
     | length str == 0
-    = Ok Nothing 
+    = Ok Nothing
     | length str > maxLen
     = Error
         $  fieldName
@@ -46,15 +47,15 @@ createStringOption fieldName constructor maxLen str
 
 --     Create a constrained integer using the constructor provided
 --     Return Error if input is less than minVal or more than maxVal
---     let createInt fieldName ctor minVal maxVal i = 
---         if i < minVal then
---             let msg = sprintf "%s: Must not be less than %i" fieldName minVal
---             Error msg
---         elif i > maxVal then
---             let msg = sprintf "%s: Must not be greater than %i" fieldName maxVal
---             Error msg
---         else
---             Ok (ctor i)
+createInt :: String -> (Int -> a) -> Int -> Int -> Int -> Result a
+createInt fieldName constructor minVal maxVal i
+    | i < minVal
+    = Error $ fieldName ++ ": Must not be less than " ++ (show minVal)
+    | i > maxVal
+    = Error $ fieldName ++ ": Must not be greater than " ++ (show maxVal)
+    | otherwise
+    = Ok (constructor i)
+
 --     Create a constrained decimal using the constructor provided
 --     Return Error if input is less than minVal or more than maxVal
 --     let createDecimal fieldName ctor minVal maxVal i = 
