@@ -2,7 +2,7 @@ module OrderTaking.Common.String50Spec ( spec ) where
 
 
 import Test.Hspec (Spec, hspec, describe, it, shouldBe)
-import           OrderTaking.Common.String50
+import           OrderTaking.Common.String50 as String50
 import           OrderTaking.Common.Result
 
 spec :: Spec
@@ -31,5 +31,5 @@ spec = describe "String50" $ do
         it "should refuse to create a too long string"
             $ createOption "myfieldName" "012345678901234567890123456789012345678901234567891" `shouldBe` Error "myfieldName must not be more than 50 chars"
 
-valueR (Ok a) = value a
-valueMR (Ok (Just a)) = value a
+valueR (Ok a) = String50.value a
+valueMR (Ok (Just a)) = String50.value a
