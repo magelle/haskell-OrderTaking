@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 2f21c11e424b8ccd59027dfd1b9a34cbbcb08ef2d6b927de8073b50e3e1d5e8b
+-- hash: 14e692abbf8e4421f61509fe22762ae94368bf05b4f033dff0b8543e4b727b87
 
 name:           eshop
 version:        0.1.0.0
@@ -48,6 +48,9 @@ library
       OrderTaking.Common.VipStatus
       OrderTaking.Common.WidgetCode
       OrderTaking.Common.ZipCode
+      OrderTaking.CompoundTypes.Address
+      OrderTaking.CompoundTypes.CustomerInfo
+      OrderTaking.CompoundTypes.PersonalName
   other-modules:
       Paths_eshop
   hs-source-dirs:
