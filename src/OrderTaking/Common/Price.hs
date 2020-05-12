@@ -10,16 +10,16 @@ import           OrderTaking.Common.ConstrainedType
 import           OrderTaking.Common.Result
 
 -- Constrained to be a decimal between 0.0 and 1000.00 
-data Price = PriceContent Double deriving (Eq, Show)
+data Price = MkPrice Double deriving (Eq, Show)
 
 -- Return the value inside a Price 
 value :: Price -> Double
-value (PriceContent v) = v
+value (MkPrice v) = v
 
 -- Create a Price from a decimal.
 -- Return Error if input is not a decimal between 0.0 and 1000.00  
 create :: Double -> Result Price String
-create = createDecimal "Price" PriceContent 0.0 1000.0
+create = createDecimal "Price" MkPrice 0.0 1000.0
 
 -- Create a Price from a decimal.
 -- Throw an exception if out of bounds. This should only be used if you know the value is valid.
@@ -34,4 +34,4 @@ create = createDecimal "Price" PriceContent 0.0 1000.0
 -- Multiply a Price by a decimal qty.
 -- Return Error if new price is out of bounds.
 multiply :: Double -> Price -> Result Price String
-multiply qty (PriceContent p) = create (qty * p)
+multiply qty (MkPrice p) = create (qty * p)

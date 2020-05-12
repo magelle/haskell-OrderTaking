@@ -12,16 +12,16 @@ import           OrderTaking.Common.Price as Price
 import           Data.List as List
 
 -- Constrained to be a integer between 1 and 10000
-data BillingAmount = BillingAmountContent Double deriving (Eq, Show)
+data BillingAmount = MkBillingAmount Double deriving (Eq, Show)
 
 -- Return the value inside a BillingAmount 
 value :: BillingAmount -> Double
-value (BillingAmountContent v) = v
+value (MkBillingAmount v) = v
 
 -- Create a BillingAmount from a decimal.
 -- Return Error if input is not a decimal between 0.0 and 10000.00 
 create :: Double -> Result BillingAmount String
-create = createDecimal "BillingAmount" BillingAmountContent 0.0 10000.0
+create = createDecimal "BillingAmount" MkBillingAmount 0.0 10000.0
 
 
 -- Sum a list of prices to make a billing amount

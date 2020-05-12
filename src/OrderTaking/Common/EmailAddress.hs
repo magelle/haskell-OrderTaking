@@ -9,13 +9,13 @@ import           OrderTaking.Common.Result
 import           OrderTaking.Common.ConstrainedType
 
 -- An email address
-data EmailAddress = EmailAddressContent String deriving (Eq, Show)
+data EmailAddress = MkEmailAddress String deriving (Eq, Show)
 
 -- Return the string value inside an EmailAddress 
 value :: EmailAddress -> String
-value (EmailAddressContent str) = str
+value (MkEmailAddress str) = str
 
 -- Create an EmailAddress from a string
 -- Return Error if input is null, empty, or doesn't have an "@" in it
 create :: String -> String -> Result EmailAddress String
-create fieldName = createLike fieldName EmailAddressContent "^.+@.+$"
+create fieldName = createLike fieldName MkEmailAddress "^.+@.+$"

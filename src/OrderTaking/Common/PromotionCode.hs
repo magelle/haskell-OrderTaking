@@ -1,6 +1,6 @@
 module OrderTaking.Common.PromotionCode
-    ( PromotionCode
+    ( PromotionCode(..)
     )
 where
 
-type PromotionCode = String
+data PromotionCode = MkPromotionCode String

@@ -1,19 +1,20 @@
 module OrderTaking.PublicTypes.PublicTypes
     (
-UnvalidatedCustomerInfo
-,UnvalidatedAddress
-,UnvalidatedOrderLine
-,UnvalidatedOrder
-,OrderAcknowledgmentSent
-,ShippableOrderLine
-,ShippableOrderPlaced
-,BillableOrderPlaced
-,PlaceOrderEvent
-,ValidationError
-,PricingError
-,ServiceInfo
-,RemoteServiceError
-,PlaceOrderError
+UnvalidatedCustomerInfo(..)
+,UnvalidatedAddress(..)
+,UnvalidatedOrderLine(..)
+,UnvalidatedOrder(..)
+,OrderAcknowledgmentSent(..)
+,ShippableOrderLine(..)
+,ShippableOrderPlaced(..)
+,BillableOrderPlaced(..)
+,PlaceOrderEvent(..)
+,ValidationError(..)
+,PricingError(..)
+,ServiceInfo(..)
+,RemoteServiceError(..)
+,PlaceOrderError(..)
+,PlaceOrder
     )
 where
 

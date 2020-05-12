@@ -9,13 +9,13 @@ import           OrderTaking.Common.Result
 import           OrderTaking.Common.ConstrainedType
 
 -- A zip code
-data WidgetCode = WidgetCodeContent String deriving (Eq, Show)
+data WidgetCode = MkWidgetCode String deriving (Eq, Show)
 
 -- Return the string value inside a WidgetCode
 value :: WidgetCode -> String
-value (WidgetCodeContent str) = str
+value (MkWidgetCode str) = str
 
 -- Create an WidgetCode from a string
 -- Return Error if input is null. empty, or not matching pattern
 create :: String -> String -> Result WidgetCode String
-create fieldName = createLike fieldName WidgetCodeContent "^W[0-9]{4}$"
+create fieldName = createLike fieldName MkWidgetCode "^W[0-9]{4}$"
