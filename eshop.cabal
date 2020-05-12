@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: eac8a4d471b2d77191c69ad7068f6bdf8173ad21915cee0167129d26d71c5652
+-- hash: 5b06f767a0006f4dbdcfa2904c6863e3d9d9162d224d10700e5b0006447e8372
 
 name:           eshop
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      OrderTaking.Common.BillingAmount
       OrderTaking.Common.ConstrainedType
       OrderTaking.Common.EmailAddress
       OrderTaking.Common.GizmoCode
@@ -71,6 +72,7 @@ test-suite eshop-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
+      OrderTaking.Common.BillingAmountSpec
       OrderTaking.Common.ConstrainedTypeSpec
       OrderTaking.Common.EmailAddressSpec
       OrderTaking.Common.GizmoCodeSpec
