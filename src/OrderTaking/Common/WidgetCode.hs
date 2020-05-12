@@ -17,5 +17,5 @@ value (WidgetCodeContent str) = str
 
 -- Create an WidgetCode from a string
 -- Return Error if input is null. empty, or not matching pattern
-create :: String -> String -> Result WidgetCode
+create :: String -> String -> Result WidgetCode String
 create fieldName = createLike fieldName WidgetCodeContent "^W[0-9]{4}$"

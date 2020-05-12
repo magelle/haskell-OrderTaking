@@ -17,7 +17,7 @@ value Vip    = "VIP"
 
 -- Create a VipStatus from a string
 -- Return Error if input is null, empty, or doesn't match one of the cases
-create :: String -> String -> Result VipStatus
+create :: String -> String -> Result VipStatus String
 create _         "normal" = Ok Normal
 create _         "Normal" = Ok Normal
 create _         "vip"    = Ok Vip

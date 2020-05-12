@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 14e692abbf8e4421f61509fe22762ae94368bf05b4f033dff0b8543e4b727b87
+-- hash: 22e7ce8aba0603a7f17b6ebbeba631329122d0c55a0b102731560f047181a750
 
 name:           eshop
 version:        0.1.0.0
@@ -51,6 +51,8 @@ library
       OrderTaking.CompoundTypes.Address
       OrderTaking.CompoundTypes.CustomerInfo
       OrderTaking.CompoundTypes.PersonalName
+      OrderTaking.InternalTypes.InternalTypes
+      OrderTaking.PublicTypes.PublicTypes
   other-modules:
       Paths_eshop
   hs-source-dirs:
@@ -58,6 +60,7 @@ library
   build-depends:
       base >=4.7 && <5
     , bytestring
+    , polysemy
     , regex-tdfa
   default-language: Haskell2010
 
@@ -72,6 +75,7 @@ executable eshop-exe
       base >=4.7 && <5
     , bytestring
     , eshop
+    , polysemy
     , regex-tdfa
   default-language: Haskell2010
 
@@ -105,5 +109,6 @@ test-suite eshop-test
     , bytestring
     , eshop
     , hspec
+    , polysemy
     , regex-tdfa
   default-language: Haskell2010

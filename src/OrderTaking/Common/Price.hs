@@ -18,7 +18,7 @@ value (PriceContent v) = v
 
 -- Create a Price from a decimal.
 -- Return Error if input is not a decimal between 0.0 and 1000.00  
-create :: Double -> Result Price
+create :: Double -> Result Price String
 create = createDecimal "Price" PriceContent 0.0 1000.0
 
 -- Create a Price from a decimal.
@@ -33,5 +33,5 @@ create = createDecimal "Price" PriceContent 0.0 1000.0
 
 -- Multiply a Price by a decimal qty.
 -- Return Error if new price is out of bounds.
-multiply :: Double -> Price -> Result Price
+multiply :: Double -> Price -> Result Price String
 multiply qty (PriceContent p) = create (qty * p)

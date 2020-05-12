@@ -17,5 +17,5 @@ value (ZipCodeContent str) = str
 
 -- Create a ZipCode from a string
 -- Return Error if input is null, empty, or doesn't have 5 digits
-create :: String -> String -> Result ZipCode
+create :: String -> String -> Result ZipCode String
 create fieldName = createLike fieldName ZipCodeContent "^[0-9]{5}$"

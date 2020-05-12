@@ -22,6 +22,6 @@ value (Unit     uq) = (fromIntegral . UnitQuantity.value) uq
 value (Kilogram kq) = KilogramQuantity.value kq
 
 -- Create a OrderQuantity from a productCode and quantity  
-create :: String -> ProductCode -> Double -> Result OrderQuantity
+create :: String -> ProductCode -> Double -> Result OrderQuantity String
 create fieldName (Widget _) = (mapR Unit) . (UnitQuantity.create fieldName) . round
 create fieldName (Gizmo _) = (mapR Kilogram) . (KilogramQuantity.create fieldName)

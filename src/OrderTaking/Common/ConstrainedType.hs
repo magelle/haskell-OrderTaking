@@ -15,7 +15,7 @@ import           OrderTaking.Common.Result
 -- ===============================
 --     Create a constrained string using the constructor provided
 --     Return Error if input is null, empty, or length > maxLen
-createString :: String -> (String -> a) -> Int -> String -> Result a
+createString :: String -> (String -> a) -> Int -> String -> Result a String
 createString fieldName constructor maxLen str
     | length str == 0
     = Error $ fieldName ++ " must not be empty"
@@ -33,7 +33,7 @@ createString fieldName constructor maxLen str
 --     Return error if length > maxLen
 --     Return Some if the input is valid
 createStringOption
-    :: String -> (String -> a) -> Int -> String -> Result (Maybe a)
+    :: String -> (String -> a) -> Int -> String -> Result (Maybe a) String
 createStringOption fieldName constructor maxLen str
     | length str == 0
     = Ok Nothing
@@ -48,7 +48,7 @@ createStringOption fieldName constructor maxLen str
 
 --     Create a constrained integer using the constructor provided
 --     Return Error if input is less than minVal or more than maxVal
-createInt :: String -> (Int -> a) -> Int -> Int -> Int -> Result a
+createInt :: String -> (Int -> a) -> Int -> Int -> Int -> Result a String
 createInt fieldName constructor minVal maxVal i
     | i < minVal
     = Error $ fieldName ++ ": Must not be less than " ++ (show minVal)
@@ -60,7 +60,7 @@ createInt fieldName constructor minVal maxVal i
 --     Create a constrained decimal using the constructor provided
 --     Return Error if input is less than minVal or more than maxVal
 createDecimal
-    :: String -> (Double -> a) -> Double -> Double -> Double -> Result a
+    :: String -> (Double -> a) -> Double -> Double -> Double -> Result a String
 createDecimal fieldName constructor minVal maxVal i
     | i < minVal
     = Error $ fieldName ++ ": Must not be less than " ++ (show minVal)
@@ -71,7 +71,7 @@ createDecimal fieldName constructor minVal maxVal i
 
 --     Create a constrained string using the constructor provided
 --     Return Error if input is null. empty, or does not match the regex pattern
-createLike :: String -> (String -> a) -> String -> String -> Result a
+createLike :: String -> (String -> a) -> String -> String -> Result a String
 createLike fieldName constructor pattern str
     | length str == 0
     = Error $ fieldName ++ " must not be empty"

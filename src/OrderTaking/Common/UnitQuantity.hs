@@ -17,5 +17,5 @@ value (UnitQuantityContent v) = v
 
 -- Create a UnitQuantity from a int
 -- Return Error if input is not an integer between 1 and 1000
-create :: String -> Int -> Result UnitQuantity
+create :: String -> Int -> Result UnitQuantity String
 create fieldName = createInt fieldName UnitQuantityContent 1 1000
