@@ -1,7 +1,8 @@
-module OrderTaking.Common.PdfAttachment (
-    PdfAttachment
-) where
+module OrderTaking.Common.PdfAttachment
+    ( PdfAttachment
+    )
+where
 
-import qualified Data.ByteString as B
+import qualified Data.ByteString               as B
 
-data PdfAttachment = PdfAttachment { name :: String, bytes :: B.ByteString}
+data PdfAttachment = PdfAttachment { name :: String, bytes :: B.ByteString} deriving (Eq, Show)

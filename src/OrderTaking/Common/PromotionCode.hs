@@ -3,4 +3,4 @@ module OrderTaking.Common.PromotionCode
     )
 where
 
-data PromotionCode = MkPromotionCode String
+data PromotionCode = MkPromotionCode String deriving (Eq, Show)

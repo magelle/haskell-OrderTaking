@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: af401c8b512e79b2d8a4d02d579094461f3393c3d611305e22fabaddf9f2e09c
+-- hash: 8901d10d943b20328dcf8e0767c1b110d2f6fe6e6486bc5a04d3fa123a6e0e3a
 
 name:           eshop
 version:        0.1.0.0
@@ -55,6 +55,7 @@ library
       OrderTaking.InternalTypes.InternalTypes
       OrderTaking.Pricing.Pricing
       OrderTaking.PublicTypes.PublicTypes
+      OrderTaking.Util
   other-modules:
       Paths_eshop
   hs-source-dirs:
@@ -102,6 +103,7 @@ test-suite eshop-test
       OrderTaking.Common.VipStatusSpec
       OrderTaking.Common.WidgetCodeSpec
       OrderTaking.Common.ZipCodeSpec
+      OrderTaking.Pricing.PricingSpec
       Paths_eshop
   hs-source-dirs:
       test

@@ -1,32 +1,31 @@
 module OrderTaking.PublicTypes.PublicTypes
-    (
-UnvalidatedCustomerInfo(..)
-,UnvalidatedAddress(..)
-,UnvalidatedOrderLine(..)
-,UnvalidatedOrder(..)
-,OrderAcknowledgmentSent(..)
-,ShippableOrderLine(..)
-,ShippableOrderPlaced(..)
-,BillableOrderPlaced(..)
-,PlaceOrderEvent(..)
-,ValidationLeft(..)
-,PricingLeft(..)
-,ServiceInfo(..)
-,RemoteServiceLeft(..)
-,PlaceOrderLeft(..)
-,PlaceOrder
+    ( UnvalidatedCustomerInfo(..)
+    , UnvalidatedAddress(..)
+    , UnvalidatedOrderLine(..)
+    , UnvalidatedOrder(..)
+    , OrderAcknowledgmentSent(..)
+    , ShippableOrderLine(..)
+    , ShippableOrderPlaced(..)
+    , BillableOrderPlaced(..)
+    , PlaceOrderEvent(..)
+    , ValidationLeft(..)
+    , PricingLeft(..)
+    , ServiceInfo(..)
+    , RemoteServiceLeft(..)
+    , PlaceOrderLeft(..)
+    , PlaceOrder
     )
 where
 
-import OrderTaking.Common.OrderId
-import OrderTaking.Common.EmailAddress
-import OrderTaking.Common.ProductCode
-import OrderTaking.Common.OrderQuantity
-import OrderTaking.Common.PdfAttachment
-import OrderTaking.Common.BillingAmount
-import OrderTaking.Common.Result
-import OrderTaking.CompoundTypes.CustomerInfo
-import OrderTaking.CompoundTypes.Address
+import           OrderTaking.Common.OrderId
+import           OrderTaking.Common.EmailAddress
+import           OrderTaking.Common.ProductCode
+import           OrderTaking.Common.OrderQuantity
+import           OrderTaking.Common.PdfAttachment
+import           OrderTaking.Common.BillingAmount
+import           OrderTaking.Common.Result
+import           OrderTaking.CompoundTypes.CustomerInfo
+import           OrderTaking.CompoundTypes.Address
 
 -- -- ==================================
 -- -- This file contains the definitions of PUBLIC datas (exposed at the boundary of the bounded context)
@@ -47,7 +46,7 @@ data UnvalidatedCustomerInfo = UnvalidatedCustomerInfo
     , uciLastName :: String
     , uciEmailAddress :: String
     , uciVipStatus :: String
-    }
+    } deriving (Eq, Show)
 
 data UnvalidatedAddress = UnvalidatedAddress {
     uaAddressLine1 :: String
@@ -58,13 +57,13 @@ data UnvalidatedAddress = UnvalidatedAddress {
     , uaZipCode :: String
     , uaState :: String
     , uaCountry :: String
-    }
+    } deriving (Eq, Show)
 
 data UnvalidatedOrderLine = UnvalidatedOrderLine {
     ualOrderLineId :: String
     , ualProductCode :: String
     , ualQuantity :: Double
-    }
+    } deriving (Eq, Show)
 
 data UnvalidatedOrder = UnvalidatedOrder {
     uoOrderId :: String
@@ -73,7 +72,7 @@ data UnvalidatedOrder = UnvalidatedOrder {
     , uoSillingAddress :: UnvalidatedAddress
     , uoLines :: [UnvalidatedOrderLine]
     , uoPromotionCode :: String
-    }
+    } deriving (Eq, Show)
 
 
 -- -- ------------------------------------
@@ -83,7 +82,7 @@ data UnvalidatedOrder = UnvalidatedOrder {
 data OrderAcknowledgmentSent = OrderAcknowledgmentSent {
     oasOrderId :: OrderId
     , oasEmailAddress :: EmailAddress
-    }
+    } deriving (Eq, Show)
 
 
 
@@ -93,14 +92,14 @@ data OrderAcknowledgmentSent = OrderAcknowledgmentSent {
 data ShippableOrderLine = ShippableOrderLine {
     solProductCode :: ProductCode
     , solQuantity :: OrderQuantity
-    }
+    } deriving (Eq, Show)
 
 data ShippableOrderPlaced = ShippableOrderPlaced {
     spoOrderId :: OrderId
     , spoShippingAddress :: Address
     , spoShipmentLines :: [ShippableOrderLine]
     , spoPdf :: PdfAttachment
-}
+} deriving (Eq, Show)
 
 -- -- Event to send to billing context
 -- -- Will only be created if the AmountToBill is not zero
@@ -108,11 +107,11 @@ data BillableOrderPlaced = BillableOrderPlaced {
     bopOrderId :: OrderId
     , bopBillingAddress :: Address
     , bopAmountToBill :: BillingAmount
-    }
+    } deriving (Eq, Show)
 
 -- -- The possible events resulting from the PlaceOrder workflow
 -- -- Not all events will occur, depending on the logic of the workflow
-data PlaceOrderEvent = PoeShippableOrderPlaced ShippableOrderPlaced | PoeBillableOrderPlaced BillableOrderPlaced | PoeAcknowledgmentSent OrderAcknowledgmentSent
+data PlaceOrderEvent = PoeShippableOrderPlaced ShippableOrderPlaced | PoeBillableOrderPlaced BillableOrderPlaced | PoeAcknowledgmentSent OrderAcknowledgmentSent deriving (Eq, Show)
 
 
 
@@ -121,24 +120,24 @@ data PlaceOrderEvent = PoeShippableOrderPlaced ShippableOrderPlaced | PoeBillabl
 
 
 -- -- All the things that can go wrong in this workflow
-data ValidationLeft = ValidationLeft String
+data ValidationLeft = ValidationLeft String deriving (Eq, Show)
 
-data PricingLeft = PricingLeft String
+data PricingLeft = PricingLeft String deriving (Eq, Show)
 
 data ServiceInfo = ServiceInfo {
     siName :: String
     , siEndpoint :: String -- System.Uri
-    }
+    } deriving (Eq, Show)
 
 data RemoteServiceLeft = RemoteServiceLeft {
     rseService :: ServiceInfo
     , rseException :: String -- System.Exception
-    }
+    } deriving (Eq, Show)
 
 data PlaceOrderLeft =
     Validation ValidationLeft
     | Pricing PricingLeft
-    | RemoteService RemoteServiceLeft
+    | RemoteService RemoteServiceLeft deriving (Eq, Show)
 
 -- -- ------------------------------------
 -- -- the workflow itself

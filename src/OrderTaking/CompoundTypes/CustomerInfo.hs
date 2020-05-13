@@ -12,7 +12,7 @@ import           OrderTaking.Common.VipStatus
 -- ==================================
 
 data CustomerInfo = CustomerInfo {
-    name :: PersonalName 
-    , emailAddress :: EmailAddress 
+    name :: PersonalName
+    , emailAddress :: EmailAddress
     , vipStatus :: VipStatus
-}
+} deriving (Eq, Show)

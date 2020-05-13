@@ -21,4 +21,4 @@ data Address = Address {
     ,zipCode :: ZipCode
     ,state :: UsStateCode
     ,country :: String50
-    }
+    } deriving (Eq, Show)
