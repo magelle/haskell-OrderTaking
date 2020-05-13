@@ -19,13 +19,13 @@ value :: BillingAmount -> Double
 value (MkBillingAmount v) = v
 
 -- Create a BillingAmount from a decimal.
--- Return Error if input is not a decimal between 0.0 and 10000.00 
-create :: Double -> Result BillingAmount String
+-- Return Left if input is not a decimal between 0.0 and 10000.00 
+create :: Double -> Either ErrorMsg BillingAmount
 create = createDecimal "BillingAmount" MkBillingAmount 0.0 10000.0
 
 
 -- Sum a list of prices to make a billing amount
--- Return Error if total is out of bounds
-sumPrices :: [Price] -> Result BillingAmount String
+-- Return Left if total is out of bounds
+sumPrices :: [Price] -> Either ErrorMsg BillingAmount 
 sumPrices = OrderTaking.Common.BillingAmount.create . List.sum . (List.map Price.value)
 -- sumPrices prices = prices >> (List.map Price.value) >> List.sum >> OrderTaking.Common.BillingAmount.create

@@ -19,9 +19,9 @@ value (Widget wc) = WidgetCode.value wc
 value (Gizmo gc) = GizmoCode.value gc
 
 -- Create an ProductCode from a string
--- Return Error if input is null, empty, or not matching pattern
-create :: String -> String -> Result ProductCode String
-create fieldName "" = Error $ fieldName ++ ": Must not be null or empty"
-create fieldName code@('W':_) = mapR Widget (WidgetCode.create fieldName code)
-create fieldName code@('G':_) = mapR Gizmo (GizmoCode.create fieldName code)
-create fieldName code = Error $ fieldName ++ ": Format not recognized '" ++ code ++ "'"
+-- Return Left if input is null, empty, or not matching pattern
+create :: String -> String -> Either ErrorMsg ProductCode
+create fieldName "" = Left $ fieldName ++ ": Must not be null or empty"
+create fieldName code@('W':_) = fmap Widget (WidgetCode.create fieldName code)
+create fieldName code@('G':_) = fmap Gizmo (GizmoCode.create fieldName code)
+create fieldName code = Left $ fieldName ++ ": Format not recognized '" ++ code ++ "'"

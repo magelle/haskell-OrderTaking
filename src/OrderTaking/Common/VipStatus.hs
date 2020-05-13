@@ -16,10 +16,10 @@ value Normal = "Normal"
 value Vip    = "VIP"
 
 -- Create a VipStatus from a string
--- Return Error if input is null, empty, or doesn't match one of the cases
-create :: String -> String -> Result VipStatus String
-create _         "normal" = Ok Normal
-create _         "Normal" = Ok Normal
-create _         "vip"    = Ok Vip
-create _         "VIP"    = Ok Vip
-create fieldName _ = Error $ fieldName ++ ": Must be one of 'Normal', 'VIP'"
+-- Return Left if input is null, empty, or doesn't match one of the cases
+create :: String -> String -> Either ErrorMsg VipStatus
+create _         "normal" = Right Normal
+create _         "Normal" = Right Normal
+create _         "vip"    = Right Vip
+create _         "VIP"    = Right Vip
+create fieldName _ = Left $ fieldName ++ ": Must be one of 'Normal', 'VIP'"

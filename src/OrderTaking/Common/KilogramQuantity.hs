@@ -16,6 +16,6 @@ value :: KilogramQuantity -> Double
 value (MkKilogramQuantity v) = v
 
 -- Create a KilogramQuantity from a decimal
--- Return Error if input is not a decimal between 0.05 and 100.00 
-create :: String -> Double -> Result KilogramQuantity String
+-- Return Left if input is not a decimal between 0.05 and 100.00 
+create :: String -> Double -> Either ErrorMsg KilogramQuantity
 create fieldName = createDecimal fieldName MkKilogramQuantity 0.05 100000.0

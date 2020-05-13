@@ -9,11 +9,11 @@ UnvalidatedCustomerInfo(..)
 ,ShippableOrderPlaced(..)
 ,BillableOrderPlaced(..)
 ,PlaceOrderEvent(..)
-,ValidationError(..)
-,PricingError(..)
+,ValidationLeft(..)
+,PricingLeft(..)
 ,ServiceInfo(..)
-,RemoteServiceError(..)
-,PlaceOrderError(..)
+,RemoteServiceLeft(..)
+,PlaceOrderLeft(..)
 ,PlaceOrder
     )
 where
@@ -121,27 +121,27 @@ data PlaceOrderEvent = PoeShippableOrderPlaced ShippableOrderPlaced | PoeBillabl
 
 
 -- -- All the things that can go wrong in this workflow
-data ValidationError = ValidationError String
+data ValidationLeft = ValidationLeft String
 
-data PricingError = PricingError String
+data PricingLeft = PricingLeft String
 
 data ServiceInfo = ServiceInfo {
     siName :: String
     , siEndpoint :: String -- System.Uri
     }
 
-data RemoteServiceError = RemoteServiceError {
+data RemoteServiceLeft = RemoteServiceLeft {
     rseService :: ServiceInfo
     , rseException :: String -- System.Exception
     }
 
-data PlaceOrderError =
-    Validation ValidationError
-    | Pricing PricingError
-    | RemoteService RemoteServiceError
+data PlaceOrderLeft =
+    Validation ValidationLeft
+    | Pricing PricingLeft
+    | RemoteService RemoteServiceLeft
 
 -- -- ------------------------------------
 -- -- the workflow itself
 
 type PlaceOrder
-    = UnvalidatedOrder -> AsyncResult [PlaceOrderEvent] PlaceOrderError
+    = UnvalidatedOrder -> AsyncResult [PlaceOrderEvent] PlaceOrderLeft

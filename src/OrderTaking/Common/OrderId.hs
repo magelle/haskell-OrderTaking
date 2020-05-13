@@ -16,8 +16,8 @@ value :: OrderId -> String
 value (MkOrderId str) = str
 
 -- Create an OrderId from a string
--- Return Error if input is null, empty, or length > 50
-create :: String -> String -> Result OrderId String
+-- Return Left if input is null, empty, or length > 50
+create :: String -> String -> Either ErrorMsg OrderId
 create fieldName = createString fieldName MkOrderId 50
 
 

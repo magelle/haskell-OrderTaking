@@ -16,6 +16,6 @@ value :: UsStateCode -> String
 value (MkUsStateCode str) = str
 
 -- Create a UsStateCode from a string
--- Return Error if input is null, empty, or doesn't have 2 letters
-create :: String -> String -> Result UsStateCode String
+-- Return Left if input is null, empty, or doesn't have 2 letters
+create :: String -> String -> Either ErrorMsg UsStateCode 
 create fieldName = createLike fieldName MkUsStateCode "^(A[KLRZ]|C[AOT]|D[CE]|FL|GA|HI|I[ADLN]|K[SY]|LA|M[ADEINOST]|N[CDEHJMVY]|O[HKR]|P[AR]|RI|S[CD]|T[NX]|UT|V[AIT]|W[AIVY])$"

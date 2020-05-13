@@ -1,6 +1,6 @@
 module OrderTaking.Common.VipStatusSpec ( spec ) where
 
-
+import Data.Either
 import Test.Hspec (Spec, hspec, describe, it, shouldBe)
 import           OrderTaking.Common.VipStatus
 import           OrderTaking.Common.Result
@@ -9,7 +9,7 @@ spec :: Spec
 spec = describe "VipStatus" $ do
     describe "Create a vip status" $ do
         it "should accept to create" $ do
-            isOk (create "myfieldName" "normal") `shouldBe` True
+            isRight (create "myfieldName" "normal") `shouldBe` True
         it "should create a VipStatus normal" $ do
             valueR (create "myfieldName" "normal") `shouldBe` Normal
         it "should create a VipStatus Normal" $ do
@@ -19,6 +19,6 @@ spec = describe "VipStatus" $ do
         it "should create a VipStatus VIP" $ do
             valueR (create "myfieldName" "VIP") `shouldBe` Vip
         it "should return an error otherwise" $ do 
-            create "myfieldName" "text" `shouldBe` Error "myfieldName: Must be one of 'Normal', 'VIP'"
+            create "myfieldName" "text" `shouldBe` Left "myfieldName: Must be one of 'Normal', 'VIP'"
 
-valueR (Ok a) = a
+valueR (Right a) = a

@@ -16,6 +16,6 @@ value :: EmailAddress -> String
 value (MkEmailAddress str) = str
 
 -- Create an EmailAddress from a string
--- Return Error if input is null, empty, or doesn't have an "@" in it
-create :: String -> String -> Result EmailAddress String
+-- Return Left if input is null, empty, or doesn't have an "@" in it
+create :: String -> String -> Either ErrorMsg EmailAddress
 create fieldName = createLike fieldName MkEmailAddress "^.+@.+$"

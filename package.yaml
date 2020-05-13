@@ -23,7 +23,7 @@ dependencies:
 - base >= 4.7 && < 5
 - regex-tdfa
 - bytestring
-- polysemy
+- validation
 
 library:
   source-dirs: src

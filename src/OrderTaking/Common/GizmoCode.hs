@@ -16,6 +16,6 @@ value :: GizmoCode -> String
 value (MkGizmoCode str) = str
 
 -- Create an GizmoCode from a string
--- Return Error if input is null. empty, or not matching pattern
-create :: String -> String -> Result GizmoCode String
+-- Return Left if input is null. empty, or not matching pattern
+create :: String -> String -> Either ErrorMsg GizmoCode
 create fieldName = createLike fieldName MkGizmoCode "^G[0-9]{4}$"

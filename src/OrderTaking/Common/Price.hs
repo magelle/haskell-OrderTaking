@@ -17,8 +17,8 @@ value :: Price -> Double
 value (MkPrice v) = v
 
 -- Create a Price from a decimal.
--- Return Error if input is not a decimal between 0.0 and 1000.00  
-create :: Double -> Result Price String
+-- Return Left if input is not a decimal between 0.0 and 1000.00  
+create :: Double -> Either ErrorMsg Price
 create = createDecimal "Price" MkPrice 0.0 1000.0
 
 -- Create a Price from a decimal.
@@ -28,10 +28,10 @@ create = createDecimal "Price" MkPrice 0.0 1000.0
 --     |> function
 --         | Ok price -> 
 --             price
---         | Error err -> 
+--         | Left err -> 
 --             failwithf "Not expecting Price to be out of bounds: %s" err
 
 -- Multiply a Price by a decimal qty.
--- Return Error if new price is out of bounds.
-multiply :: Double -> Price -> Result Price String
+-- Return Left if new price is out of bounds.
+multiply :: Double -> Price -> Either ErrorMsg Price
 multiply qty (MkPrice p) = create (qty * p)

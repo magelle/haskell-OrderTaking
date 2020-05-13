@@ -1,5 +1,5 @@
 module OrderTaking.InternalTypes.InternalTypes (
-    AddressValidationError(..),
+    AddressValidationLeft(..),
 CheckedAddress(..),
 PricingMethod(..),
 ValidatedOrderLine(..),
@@ -59,12 +59,12 @@ import OrderTaking.PublicTypes.PublicTypes
 type CheckProductCodeExists = ProductCode -> Bool
 
 -- Address validation
-data AddressValidationError = InvalidFormat | AddressNotFound 
+data AddressValidationLeft = InvalidFormat | AddressNotFound 
 
 data CheckedAddress = CheckedAddress UnvalidatedAddress
 
 type CheckAddressExists = 
-    UnvalidatedAddress -> AsyncResult CheckedAddress AddressValidationError
+    UnvalidatedAddress -> AsyncResult CheckedAddress AddressValidationLeft
 
 -- ---------------------------
 -- Validated Order 
@@ -91,7 +91,7 @@ type ValidateOrder =
     CheckProductCodeExists  -- dependency
      -> CheckAddressExists  -- dependency
      -> UnvalidatedOrder    -- input
-     -> AsyncResult ValidatedOrder ValidationError -- output
+     -> AsyncResult ValidatedOrder ValidationLeft -- output
 
 -- ---------------------------
 -- Pricing step
@@ -140,7 +140,7 @@ data PricedOrder = PricedOrder {
 type PriceOrder = 
     GetPricingFunction     -- dependency
      -> ValidatedOrder  -- input
-     -> Result PricedOrder PricingError  -- output
+     -> Either PricingLeft PricedOrder   -- output
 
 -- ---------------------------
 -- Shipping

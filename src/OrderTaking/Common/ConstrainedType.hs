@@ -14,69 +14,69 @@ import           OrderTaking.Common.Result
 -- Reusable constructors and getters for constrained types
 -- ===============================
 --     Create a constrained string using the constructor provided
---     Return Error if input is null, empty, or length > maxLen
-createString :: String -> (String -> a) -> Int -> String -> Result a String
+--     Return Left if input is null, empty, or length > maxLen
+createString :: String -> (String -> a) -> Int -> String -> Either ErrorMsg a
 createString fieldName constructor maxLen str
     | length str == 0
-    = Error $ fieldName ++ " must not be empty"
+    = Left $ fieldName ++ " must not be empty"
     | length str > maxLen
-    = Error
+    = Left
         $  fieldName
         ++ " must not be more than "
         ++ (show maxLen)
         ++ " chars"
     | otherwise
-    = Ok $ constructor str
+    = Right $ constructor str
 
 --     Create a optional constrained string using the constructor provided
 --     Return None if input is null, empty. 
 --     Return error if length > maxLen
 --     Return Some if the input is valid
 createStringOption
-    :: String -> (String -> a) -> Int -> String -> Result (Maybe a) String
+    :: String -> (String -> a) -> Int -> String -> Either ErrorMsg (Maybe a)
 createStringOption fieldName constructor maxLen str
     | length str == 0
-    = Ok Nothing
+    = Right Nothing
     | length str > maxLen
-    = Error
+    = Left
         $  fieldName
         ++ " must not be more than "
         ++ (show maxLen)
         ++ " chars"
     | otherwise
-    = Ok (Just $ constructor str)
+    = Right (Just $ constructor str)
 
 --     Create a constrained integer using the constructor provided
---     Return Error if input is less than minVal or more than maxVal
-createInt :: String -> (Int -> a) -> Int -> Int -> Int -> Result a String
+--     Return Left if input is less than minVal or more than maxVal
+createInt :: String -> (Int -> a) -> Int -> Int -> Int -> Either ErrorMsg a
 createInt fieldName constructor minVal maxVal i
     | i < minVal
-    = Error $ fieldName ++ ": Must not be less than " ++ (show minVal)
+    = Left $ fieldName ++ ": Must not be less than " ++ (show minVal)
     | i > maxVal
-    = Error $ fieldName ++ ": Must not be greater than " ++ (show maxVal)
+    = Left $ fieldName ++ ": Must not be greater than " ++ (show maxVal)
     | otherwise
-    = Ok (constructor i)
+    = Right (constructor i)
 
 --     Create a constrained decimal using the constructor provided
---     Return Error if input is less than minVal or more than maxVal
+--     Return Left if input is less than minVal or more than maxVal
 createDecimal
-    :: String -> (Double -> a) -> Double -> Double -> Double -> Result a String
+    :: String -> (Double -> a) -> Double -> Double -> Double -> Either ErrorMsg a
 createDecimal fieldName constructor minVal maxVal i
     | i < minVal
-    = Error $ fieldName ++ ": Must not be less than " ++ (show minVal)
+    = Left $ fieldName ++ ": Must not be less than " ++ (show minVal)
     | i > maxVal
-    = Error $ fieldName ++ ": Must not be greater than " ++ (show maxVal)
+    = Left $ fieldName ++ ": Must not be greater than " ++ (show maxVal)
     | otherwise
-    = Ok (constructor i)
+    = Right (constructor i)
 
 --     Create a constrained string using the constructor provided
---     Return Error if input is null. empty, or does not match the regex pattern
-createLike :: String -> (String -> a) -> String -> String -> Result a String
+--     Return Left if input is null. empty, or does not match the regex pattern
+createLike :: String -> (String -> a) -> String -> String -> Either ErrorMsg a
 createLike fieldName constructor pattern str
     | length str == 0
-    = Error $ fieldName ++ " must not be empty"
+    = Left $ fieldName ++ " must not be empty"
     | not (matchRegex pattern str)
-    = Error
+    = Left
         $  fieldName
         ++ " : '"
         ++ str
@@ -84,4 +84,4 @@ createLike fieldName constructor pattern str
         ++ pattern
         ++ "'"
     | otherwise
-    = Ok $ constructor str
+    = Right $ constructor str
