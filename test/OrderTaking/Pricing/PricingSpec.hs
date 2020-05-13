@@ -28,22 +28,21 @@ spec = describe "Pricing" $ do
         it "get the promotion price when there is a promotion code" $
             getPricingFunction standardPricing promotionWithProductPrice promotionCode productCode 
             `shouldBe` priceInPromotion
-        it "get the promotion price when there is a promotion code" $
-            getPricingFunction standardPricing promotionWithoutProductPrice promotionCode2 productCode 
+        it "get the standard price when there is a promotion code but no" $
+            getPricingFunction standardPricing promotionWithoutProductPrice promotionCode productCode 
             `shouldBe` standardPrice
 
 promotionCode = (Promotion (MkPromotionCode "PROMO"))
-promotionCode2 = (Promotion (MkPromotionCode "PROMO2"))
 productCode = extract $ ProductCode.create "" "G1234"
 standardPrice = extract $ Price.create 5.0
 priceInPromotion = extract $ Price.create 5.0
 
-standardPrices = \pc -> case pc of productCode -> standardPrice
-priceWithPromotion = \pc -> case pc of productCode -> Just $ priceInPromotion
-noPriceInPromotion = \pc -> case pc of productCode -> Nothing
+standardPrices = \_ -> standardPrice
+priceWithPromotion = \_ -> Just $ priceInPromotion
+noPriceInPromotion = \_ -> Nothing
 
 standardPricing () = standardPrices
-promotionWithProductPrice promotionCode = priceWithPromotion
-promotionWithoutProductPrice promotionCode = noPriceInPromotion
+promotionWithProductPrice _ = priceWithPromotion
+promotionWithoutProductPrice _ = noPriceInPromotion
 
 extract (Right a) = a 
