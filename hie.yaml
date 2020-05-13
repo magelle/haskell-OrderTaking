@@ -1,0 +1,6 @@
+cradle:
+  stack:
+    component: "eshop:exe:eshop-exe"
+    component: "eshop:lib"
+    component: "eshop:test:eshop-test"
+
