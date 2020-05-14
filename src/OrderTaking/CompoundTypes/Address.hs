@@ -1,5 +1,5 @@
 module OrderTaking.CompoundTypes.Address
-    ( Address
+    ( Address(..)
     )
 where
 
@@ -12,7 +12,7 @@ import           OrderTaking.Common.UsStateCode
 -- ==================================
 
 
-data Address = Address {
+data Address = MkAddress {
     addressLine1 :: String50
     ,addressLine2 :: Maybe String50
     ,addressLine3 :: Maybe String50

@@ -1,5 +1,5 @@
 module OrderTaking.CompoundTypes.CustomerInfo
-    ( CustomerInfo
+    ( CustomerInfo (..)
     )
 where
 
@@ -11,7 +11,7 @@ import           OrderTaking.Common.VipStatus
 -- Customer-related types
 -- ==================================
 
-data CustomerInfo = CustomerInfo {
+data CustomerInfo = MkCustomerInfo {
     name :: PersonalName
     , emailAddress :: EmailAddress
     , vipStatus :: VipStatus

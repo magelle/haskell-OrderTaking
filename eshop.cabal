@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 8901d10d943b20328dcf8e0767c1b110d2f6fe6e6486bc5a04d3fa123a6e0e3a
+-- hash: b15f9a2d646052578f1d351093c5e7a3ff65e14fba4e1c0866c2df8f81700e0a
 
 name:           eshop
 version:        0.1.0.0
@@ -103,6 +103,7 @@ test-suite eshop-test
       OrderTaking.Common.VipStatusSpec
       OrderTaking.Common.WidgetCodeSpec
       OrderTaking.Common.ZipCodeSpec
+      OrderTaking.Implementation.ImplementationSpec
       OrderTaking.Pricing.PricingSpec
       Paths_eshop
   hs-source-dirs:

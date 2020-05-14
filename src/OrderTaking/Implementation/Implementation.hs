@@ -1,6 +1,9 @@
-module OrderTaking.Implementation.Implementation () where
+module OrderTaking.Implementation.Implementation (
+    toCustomerInfo
+) where
 
 -- import OrderTaking.Common.
+-- import Data.Either.Validation
 import qualified OrderTaking.Common.String50 as String50
 import qualified OrderTaking.Common.EmailAddress as EmailAddress
 import qualified OrderTaking.Common.VipStatus as VipStatus
@@ -31,19 +34,17 @@ import OrderTaking.InternalTypes.InternalTypes
 -- ValidateOrder step
 -- -----------------------------
 
--- toCustomerInfo :: UnvalidatedCustomerInfo -> Result CustomerInfo String
--- toCustomerInfo unvalidatedCustomerInfo = 
---     let 
---         firstName = ((mapLeftR ValidationLeft) . (String50.create "FirstName")) $ uciFirstName unvalidatedCustomerInfo 
---         ; lastName = ((mapLeftR ValidationLeft) . (String50.create "LastName")) $ uciLastName unvalidatedCustomerInfo
---         ; emailAddress = ((mapLeftR ValidationLeft) . (EmailAddress.create "EmailAddress")) $ uciEmailAddress unvalidatedCustomerInfo
---         ; vipStatus = ((mapLeftR ValidationLeft) . (VipStatus.create "vipStatus")) $ uciVipStatus unvalidatedCustomerInfo
---     in
---         Ok CustomerInfo.CustomerInfo {
---             name = PersonalName.MkPersonalName { firstName = firstName, lastName = lastName }
---             , emailAddress = emailAddress
---             , vipStatus = vipStatus
---         }
+toCustomerInfo :: UnvalidatedCustomerInfo -> Either ErrorMsg CustomerInfo
+toCustomerInfo unvalidatedCustomerInfo = do
+    firstName <- String50.create "FirstName" $ uciFirstName unvalidatedCustomerInfo
+    lastName <- String50.create "LastName" $ uciLastName unvalidatedCustomerInfo
+    emailAddress <- EmailAddress.create "EmailAddress" $ uciEmailAddress unvalidatedCustomerInfo
+    vipStatus <- VipStatus.create "vipStatus" $ uciVipStatus unvalidatedCustomerInfo
+    Right CustomerInfo.MkCustomerInfo {
+            name = PersonalName.MkPersonalName { firstName = firstName, lastName = lastName }
+            , emailAddress = emailAddress
+            , vipStatus = vipStatus
+        }
 
 -- let toCustomerInfo (unvalidatedCustomerInfo: UnvalidatedCustomerInfo) =
 --     result {
