@@ -41,7 +41,7 @@ toCustomerInfo unvalidatedCustomerInfo = do
     emailAddress <- EmailAddress.create "EmailAddress" $ uciEmailAddress unvalidatedCustomerInfo
     vipStatus <- VipStatus.create "vipStatus" $ uciVipStatus unvalidatedCustomerInfo
     Right CustomerInfo.MkCustomerInfo {
-            name = PersonalName.MkPersonalName { firstName = firstName, lastName = lastName }
+            name = PersonalName.MkPersonalName { firstName = firstName, lastName = lastName } 
             , emailAddress = emailAddress
             , vipStatus = vipStatus
         }

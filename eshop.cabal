@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: b15f9a2d646052578f1d351093c5e7a3ff65e14fba4e1c0866c2df8f81700e0a
+-- hash: f022160de21d7353816e69c516aff2ffdcfd3fe099ee3412bd700858c53a366a
 
 name:           eshop
 version:        0.1.0.0
@@ -64,7 +64,6 @@ library
       base >=4.7 && <5
     , bytestring
     , regex-tdfa
-    , validation
   default-language: Haskell2010
 
 executable eshop-exe
@@ -79,7 +78,6 @@ executable eshop-exe
     , bytestring
     , eshop
     , regex-tdfa
-    , validation
   default-language: Haskell2010
 
 test-suite eshop-test
@@ -115,5 +113,4 @@ test-suite eshop-test
     , eshop
     , hspec
     , regex-tdfa
-    , validation
   default-language: Haskell2010

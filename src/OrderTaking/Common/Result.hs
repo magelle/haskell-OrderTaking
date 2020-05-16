@@ -1,17 +1,11 @@
 module OrderTaking.Common.Result
     ( ErrorMsg
     , AsyncResult(..)
-    , mapError
     )
 where
 
-import           Data.Either
-import qualified Data.Validation
 
 type ErrorMsg = String
-mapError :: Either e a -> Either [e] a
-mapError (Left e) = Left [e]
-mapError (Right a) = Right a
 
 -- ==============================================
 -- The `Validation` type is the same as the `Result` type but with a *list* for failures
