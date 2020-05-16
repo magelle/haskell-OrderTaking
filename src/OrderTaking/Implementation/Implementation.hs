@@ -20,6 +20,8 @@ import           OrderTaking.InternalTypes.InternalTypes
 import qualified OrderTaking.Common.ZipCode    as ZipCode
 import qualified OrderTaking.Common.UsStateCode
                                                as UsStateCode
+import qualified OrderTaking.Common.OrderId
+                                               as OrderId
 -- ======================================================
 -- This file contains the final implementation for the PlaceOrderWorkflow
 -- 
@@ -103,6 +105,9 @@ toCheckedAddress checkAddress = (AsyncResult.mapLeft \ addrLeft ->
 --     orderId 
 --     |> OrderId.create "OrderId"
 --     |> Result.mapLeft ValidationLeft // convert creation error into ValidationLeft
+
+toOrderId :: String -> OrderId
+toOrderId = OrderId.create "OrderId"
 
 --  Helper function for validateOrder   
 -- let toOrderLineId orderId = 
