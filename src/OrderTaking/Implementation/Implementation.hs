@@ -72,63 +72,15 @@ toAddress unvalidatedAddress = do
     zipCode <- ZipCode.create "ZipCode" $ uaZipCode unvalidatedAddress
     state   <- UsStateCode.create "State" $ uaState unvalidatedAddress
     country <- String50.create "Country" $ uaCountry unvalidatedAddress
-    Right Address.MkAddress {
-            addressLine1 = addressLine1
-            , addressLine2 = addressLine2
-            , addressLine3 = addressLine3
-            , addressLine4 = addressLine4
-            , city = city
-            , zipCode = zipCode
-            , state = state
-            , country = country
-            }
-
--- let toAddress (CheckedAddress unvalidatedAddress) =
---     result {
---         let! addressLine1 = 
---             unvalidatedAddress.AddressLine1 
---             |> String50.create "AddressLine1" 
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! addressLine2 = 
---             unvalidatedAddress.AddressLine2 
---             |> String50.createOption "AddressLine2"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! addressLine3 = 
---             unvalidatedAddress.AddressLine3 
---             |> String50.createOption "AddressLine3" 
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! addressLine4 = 
---             unvalidatedAddress.AddressLine4 
---             |> String50.createOption "AddressLine4"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! city = 
---             unvalidatedAddress.City
---             |> String50.create "City"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! zipCode = 
---             unvalidatedAddress.ZipCode
---             |> ZipCode.create "ZipCode"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! state = 
---             unvalidatedAddress.State
---             |> UsStateCode.create "State"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! country = 
---             unvalidatedAddress.Country 
---             |> String50.create "Country"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let address : Address = {
---             AddressLine1 = addressLine1
---             AddressLine2 = addressLine2
---             AddressLine3 = addressLine3
---             AddressLine4 = addressLine4
---             City = city
---             ZipCode = zipCode
---             State = state
---             Country = country
---             }
---         return address
---     }
+    Right Address.MkAddress { addressLine1 = addressLine1
+                            , addressLine2 = addressLine2
+                            , addressLine3 = addressLine3
+                            , addressLine4 = addressLine4
+                            , city         = city
+                            , zipCode      = zipCode
+                            , state        = state
+                            , country      = country
+                            }
 
 -- Call the checkAddressExists and convert the error to a ValidationLeft
 -- let toCheckedAddress (checkAddress:CheckAddressExists) address =
