@@ -92,6 +92,13 @@ toAddress unvalidatedAddress = do
 --         | InvalidFormat -> ValidationLeft "Address has bad format"
 --         )
 
+toCheckedAddress :: CheckAddressExists -> Address
+toCheckedAddress checkAddress = (AsyncResult.mapLeft \ addrLeft -> 
+        case addrLeft of 
+            AddressNotFound -> "Address not found"
+            InvalidFormat -> "Address has bad format"
+    ) . checkAddress
+
 -- let toOrderId orderId = 
 --     orderId 
 --     |> OrderId.create "OrderId"
