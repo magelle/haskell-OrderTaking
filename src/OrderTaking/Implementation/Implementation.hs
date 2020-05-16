@@ -1,18 +1,25 @@
-module OrderTaking.Implementation.Implementation (
-    toCustomerInfo
-) where
+module OrderTaking.Implementation.Implementation
+    ( toCustomerInfo
+    )
+where
 
--- import OrderTaking.Common.
--- import Data.Either.Validation
-import qualified OrderTaking.Common.String50 as String50
-import qualified OrderTaking.Common.EmailAddress as EmailAddress
-import qualified OrderTaking.Common.VipStatus as VipStatus
-import OrderTaking.Common.Result
-import OrderTaking.CompoundTypes.CustomerInfo as CustomerInfo
-import OrderTaking.CompoundTypes.PersonalName as PersonalName
-import OrderTaking.PublicTypes.PublicTypes
-import OrderTaking.InternalTypes.InternalTypes
+import qualified OrderTaking.Common.String50   as String50
+import qualified OrderTaking.Common.EmailAddress
+                                               as EmailAddress
+import qualified OrderTaking.Common.VipStatus  as VipStatus
+import           OrderTaking.Common.Result
+import           OrderTaking.CompoundTypes.CustomerInfo
+                                               as CustomerInfo
+import           OrderTaking.CompoundTypes.Address
+                                               as Address
+import           OrderTaking.CompoundTypes.PersonalName
+                                               as PersonalName
+import           OrderTaking.PublicTypes.PublicTypes
+import           OrderTaking.InternalTypes.InternalTypes
 
+import qualified OrderTaking.Common.ZipCode    as ZipCode
+import qualified OrderTaking.Common.UsStateCode
+                                               as UsStateCode
 -- ======================================================
 -- This file contains the final implementation for the PlaceOrderWorkflow
 -- 
@@ -36,42 +43,45 @@ import OrderTaking.InternalTypes.InternalTypes
 
 toCustomerInfo :: UnvalidatedCustomerInfo -> Either ErrorMsg CustomerInfo
 toCustomerInfo unvalidatedCustomerInfo = do
-    firstName <- String50.create "FirstName" $ uciFirstName unvalidatedCustomerInfo
+    firstName <- String50.create "FirstName"
+        $ uciFirstName unvalidatedCustomerInfo
     lastName <- String50.create "LastName" $ uciLastName unvalidatedCustomerInfo
-    emailAddress <- EmailAddress.create "EmailAddress" $ uciEmailAddress unvalidatedCustomerInfo
-    vipStatus <- VipStatus.create "vipStatus" $ uciVipStatus unvalidatedCustomerInfo
-    Right CustomerInfo.MkCustomerInfo {
-            name = PersonalName.MkPersonalName { firstName = firstName, lastName = lastName } 
-            , emailAddress = emailAddress
-            , vipStatus = vipStatus
+    emailAddress <- EmailAddress.create "EmailAddress"
+        $ uciEmailAddress unvalidatedCustomerInfo
+    vipStatus <- VipStatus.create "vipStatus"
+        $ uciVipStatus unvalidatedCustomerInfo
+    Right CustomerInfo.MkCustomerInfo
+        { name         = PersonalName.MkPersonalName { firstName = firstName
+                                                     , lastName  = lastName
+                                                     }
+        , emailAddress = emailAddress
+        , vipStatus    = vipStatus
         }
 
--- let toCustomerInfo (unvalidatedCustomerInfo: UnvalidatedCustomerInfo) =
---     result {
---         let! firstName = 
---             unvalidatedCustomerInfo.FirstName
---             |> String50.create "FirstName"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! lastName = 
---             unvalidatedCustomerInfo.LastName
---             |> String50.create "LastName"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! emailAddress = 
---             unvalidatedCustomerInfo.EmailAddress
---             |> EmailAddress.create "EmailAddress"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
---         let! vipStatus = 
---             unvalidatedCustomerInfo.VipStatus 
---             |> VipStatus.create "vipStatus"
---             |> Result.mapLeft ValidationLeft -- convert creation error into ValidationLeft
--- 
---         let customerInfo = {
---             Name = {FirstName=firstName; LastName=lastName}
---             EmailAddress = emailAddress
---             VipStatus = vipStatus 
---             }
---         return customerInfo 
---     }
+toAddress :: UnvalidatedAddress -> Either ErrorMsg Address
+toAddress unvalidatedAddress = do
+    addressLine1 <- String50.create "AddressLine1"
+        $ uaAddressLine1 unvalidatedAddress
+    addressLine2 <- String50.createOption "AddressLine2"
+        $ uaAddressLine2 unvalidatedAddress
+    addressLine3 <- String50.createOption "AddressLine3"
+        $ uaAddressLine3 unvalidatedAddress
+    addressLine4 <- String50.createOption "AddressLine4"
+        $ uaAddressLine4 unvalidatedAddress
+    city    <- String50.create "City" $ uaCity unvalidatedAddress
+    zipCode <- ZipCode.create "ZipCode" $ uaZipCode unvalidatedAddress
+    state   <- UsStateCode.create "State" $ uaState unvalidatedAddress
+    country <- String50.create "Country" $ uaCountry unvalidatedAddress
+    Right Address.MkAddress {
+            addressLine1 = addressLine1
+            , addressLine2 = addressLine2
+            , addressLine3 = addressLine3
+            , addressLine4 = addressLine4
+            , city = city
+            , zipCode = zipCode
+            , state = state
+            , country = country
+            }
 
 -- let toAddress (CheckedAddress unvalidatedAddress) =
 --     result {
@@ -152,7 +162,7 @@ toCustomerInfo unvalidatedCustomerInfo = do
 --         else
 --             let msg = sprintf "Invalid: %A" productCode 
 --             Left (ValidationLeft msg) 
-        
+
 --     // assemble the pipeline        
 --     productCode
 --     |> ProductCode.create "ProductCode"
@@ -163,7 +173,7 @@ toCustomerInfo unvalidatedCustomerInfo = do
 -- let toOrderQuantity productCode quantity = 
 --     OrderQuantity.create "OrderQuantity" productCode quantity  
 --     |> Result.mapLeft ValidationLeft // convert creation error into ValidationLeft
-   
+
 --  Helper function for validateOrder   
 -- let toValidatedOrderLine checkProductExists (unvalidatedOrderLine:UnvalidatedOrderLine) = 
 --     result {
@@ -297,7 +307,7 @@ toCustomerInfo unvalidatedCustomerInfo = do
 --             }
 --             return pricedOrder 
 --         }
-        
+
 
 -- // ---------------------------
 -- // Shipping step
@@ -408,7 +418,7 @@ toCustomerInfo unvalidatedCustomerInfo = do
 --         Bytes = [||]
 --         }
 --     } 
- 
+
 -- let createBillingEvent (placedOrder:PricedOrder) : BillableOrderPlaced option =
 --     let billingAmount = placedOrder.AmountToBill |> BillingAmount.value
 --     if billingAmount > 0M then
