@@ -65,7 +65,7 @@ data AddressValidationLeft = InvalidFormat | AddressNotFound deriving (Eq, Show)
 data CheckedAddress = CheckedAddress UnvalidatedAddress deriving (Eq, Show)
 
 type CheckAddressExists
-    = UnvalidatedAddress -> AsyncResult CheckedAddress AddressValidationLeft
+    = UnvalidatedAddress -> IOResult AddressValidationLeft CheckedAddress 
 
 -- ---------------------------
 -- Validated Order 
@@ -92,7 +92,7 @@ type ValidateOrder
     =  CheckProductCodeExists  -- dependency
     -> CheckAddressExists  -- dependency
     -> UnvalidatedOrder    -- input
-    -> AsyncResult ValidatedOrder ValidationLeft -- output
+    -> IOResult ValidationLeft ValidatedOrder -- output
 
 -- ---------------------------
 -- Pricing step

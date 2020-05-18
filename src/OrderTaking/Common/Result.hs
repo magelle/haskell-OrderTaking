@@ -1,9 +1,10 @@
 module OrderTaking.Common.Result
     ( ErrorMsg
-    , AsyncResult(..)
+    , IOResult(..)
     )
 where
 
+import GHC.Base
 
 type ErrorMsg = String
 
@@ -17,11 +18,9 @@ type ErrorMsg = String
 -- Async utilities
 -- ==============================================
 
-data Async val = Async val
-
 -- ==============================================
 -- AsyncResult
 -- ==============================================
 
-type AsyncResult value err = Async (Either err value)
+type IOResult err value = IO (Either err value)
 

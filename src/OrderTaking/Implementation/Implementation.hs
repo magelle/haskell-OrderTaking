@@ -3,25 +3,33 @@ module OrderTaking.Implementation.Implementation
     )
 where
 
+import           Data.Either
+import           Data.Either.Combinators
+import           GHC.Base
+import           OrderTaking.Common.Result
+import           OrderTaking.InternalTypes.InternalTypes
+import           OrderTaking.PublicTypes.PublicTypes
 import qualified OrderTaking.Common.String50   as String50
 import qualified OrderTaking.Common.EmailAddress
                                                as EmailAddress
 import qualified OrderTaking.Common.VipStatus  as VipStatus
-import           OrderTaking.Common.Result
 import           OrderTaking.CompoundTypes.CustomerInfo
                                                as CustomerInfo
 import           OrderTaking.CompoundTypes.Address
                                                as Address
 import           OrderTaking.CompoundTypes.PersonalName
                                                as PersonalName
-import           OrderTaking.PublicTypes.PublicTypes
-import           OrderTaking.InternalTypes.InternalTypes
 
 import qualified OrderTaking.Common.ZipCode    as ZipCode
 import qualified OrderTaking.Common.UsStateCode
                                                as UsStateCode
-import qualified OrderTaking.Common.OrderId
-                                               as OrderId
+import qualified OrderTaking.Common.OrderId    as OrderId
+import qualified OrderTaking.Common.OrderLineId
+                                               as OrderLineId
+import qualified OrderTaking.Common.ProductCode
+                                               as ProductCode
+import qualified OrderTaking.Common.OrderQuantity
+                                               as OrderQuantity
 -- ======================================================
 -- This file contains the final implementation for the PlaceOrderWorkflow
 -- 
@@ -84,79 +92,66 @@ toAddress unvalidatedAddress = do
                             , country      = country
                             }
 
+
 -- Call the checkAddressExists and convert the error to a ValidationLeft
--- let toCheckedAddress (checkAddress:CheckAddressExists) address =
---     address 
---     |> checkAddress 
---     |> AsyncResult.mapLeft (fun addrLeft -> 
---         match addrLeft with
---         | AddressNotFound -> ValidationLeft "Address not found"
---         | InvalidFormat -> ValidationLeft "Address has bad format"
---         )
+toCheckedAddress
+    :: CheckAddressExists
+    -> UnvalidatedAddress
+    -> IOResult ErrorMsg CheckedAddress
+toCheckedAddress checkAddress address =
+    fmap mapAddressValidationResult (checkAddress address)
 
-toCheckedAddress :: CheckAddressExists -> Address
-toCheckedAddress checkAddress = (AsyncResult.mapLeft \ addrLeft -> 
-        case addrLeft of 
-            AddressNotFound -> "Address not found"
-            InvalidFormat -> "Address has bad format"
-    ) . checkAddress
+mapAddressValidationLeft :: AddressValidationLeft -> ErrorMsg
+mapAddressValidationLeft AddressNotFound = "Address not found"
+mapAddressValidationLeft InvalidFormat   = "Address has bad format"
 
--- let toOrderId orderId = 
---     orderId 
---     |> OrderId.create "OrderId"
---     |> Result.mapLeft ValidationLeft // convert creation error into ValidationLeft
+mapAddressValidationResult
+    :: Either AddressValidationLeft CheckedAddress
+    -> Either ErrorMsg CheckedAddress
+mapAddressValidationResult (Right addr) = Right addr
+mapAddressValidationResult (Left  err ) = Left $ mapAddressValidationLeft err
 
-toOrderId :: String -> OrderId
+
+toOrderId :: String -> Either ErrorMsg OrderId.OrderId
 toOrderId = OrderId.create "OrderId"
 
 --  Helper function for validateOrder   
--- let toOrderLineId orderId = 
---     orderId 
---     |> OrderLineId.create "OrderLineId"
---     |> Result.mapLeft ValidationLeft // convert creation error into ValidationLeft
+toOrderLineId :: String -> Either ErrorMsg OrderLineId.OrderLineId
+toOrderLineId = OrderLineId.create "OrderLineId"
 
 --  Helper function for validateOrder   
--- let toProductCode (checkProductCodeExists:CheckProductCodeExists) productCode = 
+toProductCode
+    :: CheckProductCodeExists
+    -> String
+    -> Either ErrorMsg ProductCode.ProductCode
+toProductCode checkProductCodeExists productCode =
+    let checkProduct pc = if checkProductCodeExists pc
+            then Right pc
+            else Left $ "Invalid: " ++ (show pc)
+    in  ProductCode.create "ProductCode" productCode >>= checkProduct
 
---     // create a ProductCode -> Result<ProductCode,...> function 
---     // suitable for using in a pipeline
---     let checkProduct productCode  = 
---         if checkProductCodeExists productCode then
---             Ok productCode 
---         else
---             let msg = sprintf "Invalid: %A" productCode 
---             Left (ValidationLeft msg) 
-
---     // assemble the pipeline        
---     productCode
---     |> ProductCode.create "ProductCode"
---     |> Result.mapLeft ValidationLeft // convert creation error into ValidationLeft
---     |> Result.bind checkProduct 
 
 --  Helper function for validateOrder   
--- let toOrderQuantity productCode quantity = 
---     OrderQuantity.create "OrderQuantity" productCode quantity  
---     |> Result.mapLeft ValidationLeft // convert creation error into ValidationLeft
+toOrderQuantity
+    :: ProductCode.ProductCode
+    -> Double
+    -> Either ErrorMsg OrderQuantity.OrderQuantity
+toOrderQuantity = OrderQuantity.create "OrderQuantity"
 
 --  Helper function for validateOrder   
--- let toValidatedOrderLine checkProductExists (unvalidatedOrderLine:UnvalidatedOrderLine) = 
---     result {
---         let! orderLineId = 
---             unvalidatedOrderLine.OrderLineId 
---             |> toOrderLineId
---         let! productCode = 
---             unvalidatedOrderLine.ProductCode 
---             |> toProductCode checkProductExists
---         let! quantity = 
---             unvalidatedOrderLine.Quantity 
---             |> toOrderQuantity productCode 
---         let validatedOrderLine : ValidatedOrderLine = {
---             OrderLineId = orderLineId 
---             ProductCode = productCode 
---             Quantity = quantity 
---             }
---         return validatedOrderLine 
---     }
+toValidatedOrderLine
+    :: CheckProductCodeExists
+    -> UnvalidatedOrderLine
+    -> Either ErrorMsg ValidatedOrderLine
+toValidatedOrderLine checkProductExists unvalidatedOrderLine = do
+    orderLineId <- toOrderLineId $ ualOrderLineId unvalidatedOrderLine
+    productCode <- toProductCode checkProductExists
+        $ ualProductCode unvalidatedOrderLine
+    quantity <- toOrderQuantity productCode $ ualQuantity unvalidatedOrderLine
+    Right ValidatedOrderLine { volOrderLineId = orderLineId
+                             , volProductCode = productCode
+                             , volQuantity    = quantity
+                             }
 
 -- let validateOrder : ValidateOrder = 
 --     fun checkProductCodeExists checkAddressExists unvalidatedOrder ->

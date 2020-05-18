@@ -143,4 +143,4 @@ data PlaceOrderLeft =
 -- -- the workflow itself
 
 type PlaceOrder
-    = UnvalidatedOrder -> AsyncResult [PlaceOrderEvent] PlaceOrderLeft
+    = UnvalidatedOrder -> IOResult PlaceOrderLeft [PlaceOrderEvent]

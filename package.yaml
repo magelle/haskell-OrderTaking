@@ -23,6 +23,7 @@ dependencies:
 - base >= 4.7 && < 5
 - regex-tdfa
 - bytestring
+- either
 
 library:
   source-dirs: src
