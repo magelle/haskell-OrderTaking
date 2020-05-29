@@ -174,12 +174,13 @@ validateOrder checkProductCodeExists checkAddressExists unvalidatedOrder = do
     shippingAddress <- checkedShippingAddress |> toAddress |> Except.liftEither
     checkedBillingAddress <- unvalidatedOrder |> uoBillingAddress  |> (toCheckedAddress checkAddressExists) |> Except.ExceptT
     billingAddress <- checkedBillingAddress |> toAddress |> Except.liftEither
+    lines <- unvalidatedOrder |> uoLines |> map (toValidatedOrderLine checkProductCodeExists) |> sequence
     pricingMethod <- unvalidatedOrder |> uoPromotionCode |> Pricing.createPricingMethod |> Except.return
     Except.return ValidatedOrder { voOrderId         = orderId
                                  , voCustomerInfo    = customerInfo
                                  , voShippingAddress = shippingAddress
                                  , voBillingAddress  = billingAddress
-                                 , voLines           = [] -- lines
+                                 , voLines           = lines
                                  , voPricingMethod   = pricingMethod
                                  }
 
