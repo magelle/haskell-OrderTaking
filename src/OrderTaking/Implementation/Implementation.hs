@@ -227,6 +227,12 @@ toPricedOrderLine getProductPrice validatedOrderLine = do
         }
     Right $ ProductLine pricedLine
 
+addCommentLine :: PricingMethod -> [PricedOrderLine] -> PricedOrderLine
+addCommentLine Standard lines = lines
+addCommentLine Promotion (MkPromotionCode promoCode) lines = 
+    lines :: [("Applied promotion " ++ promoCode) |> CommentLine]
+
+
 -- // add the special comment line if needed
 -- let addCommentLine pricingMethod lines =
 --     match pricingMethod with
