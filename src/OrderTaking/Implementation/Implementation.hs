@@ -18,6 +18,7 @@ import           GHC.Base                      as Base
 import           OrderTaking.Common.Result
 import           OrderTaking.InternalTypes.InternalTypes
 import           OrderTaking.PublicTypes.PublicTypes
+import           OrderTaking.Common.Price      as Price
 import           OrderTaking.Pricing.Pricing   as Pricing
 import qualified OrderTaking.Common.String50   as String50
 import qualified OrderTaking.Common.EmailAddress
@@ -210,22 +211,21 @@ validateOrder checkProductCodeExists checkAddressExists unvalidatedOrder = do
 -- // PriceOrder step
 -- // ---------------------------
 
--- let toPricedOrderLine (getProductPrice:GetProductPrice) (validatedOrderLine:ValidatedOrderLine) = 
---     result {
---         let qty = validatedOrderLine.Quantity |> OrderQuantity.value 
---         let price = validatedOrderLine.ProductCode |> getProductPrice 
---         let! linePrice = 
---             Price.multiply qty price 
---             |> Result.mapLeft PricingLeft // convert to PlaceOrderLeft
---         let pricedLine : PricedOrderProductLine = {
---             OrderLineId = validatedOrderLine.OrderLineId 
---             ProductCode = validatedOrderLine.ProductCode 
---             Quantity = validatedOrderLine.Quantity
---             LinePrice = linePrice
---             }
---         return (ProductLine pricedLine)
---     }
-
+toPricedOrderLine
+    :: GetProductPrice
+    -> ValidatedOrderLine
+    -> Either PlaceOrderLeft PricedOrderLine
+toPricedOrderLine getProductPrice validatedOrderLine = do
+    qty        <- validatedOrderLine |> volQuantity |> OrderQuantity.value |> Right
+    price      <- validatedOrderLine |> volProductCode |> getProductPrice |> Right
+    linePrice  <- Price.multiply qty price |> mapLeft Pricing
+    pricedLine <- Right PricedOrderProductLine
+        { poplOrderLineId = volOrderLineId validatedOrderLine
+        , poplProductCode = volProductCode validatedOrderLine
+        , poplQuantity    = volQuantity validatedOrderLine
+        , poplLinePrice   = linePrice
+        }
+    Right $ ProductLine pricedLine
 
 -- // add the special comment line if needed
 -- let addCommentLine pricingMethod lines =

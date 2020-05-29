@@ -122,7 +122,7 @@ data PlaceOrderEvent = PoeShippableOrderPlaced ShippableOrderPlaced | PoeBillabl
 -- -- All the things that can go wrong in this workflow
 data ValidationLeft = ValidationLeft String deriving (Eq, Show)
 
-data PricingLeft = PricingLeft String deriving (Eq, Show)
+type PricingLeft = String
 
 data ServiceInfo = ServiceInfo {
     siName :: String
