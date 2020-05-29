@@ -69,7 +69,7 @@ data UnvalidatedOrder = UnvalidatedOrder {
     uoOrderId :: String
     , uoCustomerInfo :: UnvalidatedCustomerInfo
     , uoShippingAddress :: UnvalidatedAddress
-    , uoSillingAddress :: UnvalidatedAddress
+    , uoBillingAddress :: UnvalidatedAddress
     , uoLines :: [UnvalidatedOrderLine]
     , uoPromotionCode :: String
     } deriving (Eq, Show)
@@ -143,4 +143,4 @@ data PlaceOrderLeft =
 -- -- the workflow itself
 
 type PlaceOrder
-    = UnvalidatedOrder -> IOResult PlaceOrderLeft [PlaceOrderEvent]
+    = UnvalidatedOrder -> IO (Either PlaceOrderLeft [PlaceOrderEvent])

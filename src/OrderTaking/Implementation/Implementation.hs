@@ -1,14 +1,22 @@
 module OrderTaking.Implementation.Implementation
     ( toCustomerInfo
+    , toAddress
+    , toOrderId
+    , toOrderLineId
+    , toProductCode
+    , toCheckedAddress
     )
 where
 
-import           Data.Either
+import           Data.List                     as List
+import           Data.Either                   as Either
 import           Data.Either.Combinators
-import           GHC.Base
+import           Control.Monad.Except          as Except
+import           GHC.Base                      as Base
 import           OrderTaking.Common.Result
 import           OrderTaking.InternalTypes.InternalTypes
 import           OrderTaking.PublicTypes.PublicTypes
+import           OrderTaking.Pricing.Pricing   as Pricing
 import qualified OrderTaking.Common.String50   as String50
 import qualified OrderTaking.Common.EmailAddress
                                                as EmailAddress
@@ -68,8 +76,8 @@ toCustomerInfo unvalidatedCustomerInfo = do
         , vipStatus    = vipStatus
         }
 
-toAddress :: UnvalidatedAddress -> Either ErrorMsg Address
-toAddress unvalidatedAddress = do
+toAddress :: CheckedAddress -> Either ErrorMsg Address
+toAddress (CheckedAddress unvalidatedAddress) = do
     addressLine1 <- String50.create "AddressLine1"
         $ uaAddressLine1 unvalidatedAddress
     addressLine2 <- String50.createOption "AddressLine2"
@@ -97,7 +105,7 @@ toAddress unvalidatedAddress = do
 toCheckedAddress
     :: CheckAddressExists
     -> UnvalidatedAddress
-    -> IOResult ErrorMsg CheckedAddress
+    -> IO (Either ErrorMsg CheckedAddress)
 toCheckedAddress checkAddress address =
     fmap mapAddressValidationResult (checkAddress address)
 
@@ -153,50 +161,26 @@ toValidatedOrderLine checkProductExists unvalidatedOrderLine = do
                              , volQuantity    = quantity
                              }
 
--- let validateOrder : ValidateOrder = 
---     fun checkProductCodeExists checkAddressExists unvalidatedOrder ->
---         asyncResult {
---             let! orderId = 
---                 unvalidatedOrder.OrderId 
---                 |> toOrderId
---                 |> AsyncResult.ofResult
---             let! customerInfo = 
---                 unvalidatedOrder.CustomerInfo 
---                 |> toCustomerInfo
---                 |> AsyncResult.ofResult
---             let! checkedShippingAddress = 
---                 unvalidatedOrder.ShippingAddress 
---                 |> toCheckedAddress checkAddressExists
---             let! shippingAddress = 
---                 checkedShippingAddress 
---                 |> toAddress 
---                 |> AsyncResult.ofResult
---             let! checkedBillingAddress = 
---                 unvalidatedOrder.BillingAddress 
---                 |> toCheckedAddress checkAddressExists
---             let! billingAddress  = 
---                 checkedBillingAddress
---                 |> toAddress 
---                 |> AsyncResult.ofResult
---             let! lines = 
---                 unvalidatedOrder.Lines 
---                 |> List.map (toValidatedOrderLine checkProductCodeExists) 
---                 |> Result.sequence // convert list of Results to a single Result
---                 |> AsyncResult.ofResult
---             let pricingMethod = 
---                 unvalidatedOrder.PromotionCode
---                 |> PricingModule.createPricingMethod 
-
---             let validatedOrder : ValidatedOrder = {
---                 OrderId  = orderId 
---                 CustomerInfo = customerInfo 
---                 ShippingAddress = shippingAddress 
---                 BillingAddress = billingAddress  
---                 Lines = lines 
---                 PricingMethod = pricingMethod 
---             }
---             return validatedOrder 
---         }
+validateOrder
+    :: CheckProductCodeExists
+    -> CheckAddressExists
+    -> UnvalidatedOrder
+    -> Except.ExceptT ErrorMsg IO ValidatedOrder
+validateOrder checkProductCodeExists checkAddressExists unvalidatedOrder = do
+    orderId      <- (Except.liftEither . toOrderId . uoOrderId) unvalidatedOrder
+    customerInfo <- (Except.liftEither . toCustomerInfo . uoCustomerInfo) unvalidatedOrder
+    checkedShippingAddress <- (Except.ExceptT . (toCheckedAddress checkAddressExists) . uoShippingAddress) unvalidatedOrder
+    shippingAddress       <- Except.liftEither $ (toAddress checkedShippingAddress)
+    checkedBillingAddress <- (Except.ExceptT . (toCheckedAddress checkAddressExists) . uoBillingAddress) unvalidatedOrder
+    billingAddress <- Except.liftEither $ (toAddress checkedBillingAddress)
+    pricingMethod  <- (Except.return . Pricing.createPricingMethod . uoPromotionCode) unvalidatedOrder
+    Except.return ValidatedOrder { voOrderId         = orderId
+                       , voCustomerInfo    = customerInfo
+                       , voShippingAddress = shippingAddress
+                       , voBillingAddress  = billingAddress
+                       , voLines           = [] -- lines
+                       , voPricingMethod   = pricingMethod
+                       }
 
 -- // ---------------------------
 -- // PriceOrder step

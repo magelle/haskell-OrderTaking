@@ -24,6 +24,8 @@ dependencies:
 - regex-tdfa
 - bytestring
 - either
+- mtl
+- flow
 
 library:
   source-dirs: src

@@ -1,10 +1,10 @@
 cabal-version: 1.12
 
--- This file has been generated from package.yaml by hpack version 0.33.0.
+-- This file has been generated from package.yaml by hpack version 0.34.1.
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4d9a43007dd2824e8361cdb50b7edc460a2be46c671dff2597305caa7a647ea3
+-- hash: 6366703695239d044da23a8ab54b205e162a4162a7ed0583aca2affa3404e7c2
 
 name:           eshop
 version:        0.1.0.0
@@ -64,6 +64,8 @@ library
       base >=4.7 && <5
     , bytestring
     , either
+    , flow
+    , mtl
     , regex-tdfa
   default-language: Haskell2010
 
@@ -79,6 +81,8 @@ executable eshop-exe
     , bytestring
     , either
     , eshop
+    , flow
+    , mtl
     , regex-tdfa
   default-language: Haskell2010
 
@@ -114,6 +118,8 @@ test-suite eshop-test
     , bytestring
     , either
     , eshop
+    , flow
     , hspec
+    , mtl
     , regex-tdfa
   default-language: Haskell2010
