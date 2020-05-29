@@ -1,6 +1,7 @@
 module OrderTaking.Common.Price
     ( Price()
     , create
+    , unsafeCreate
     , value
     , multiply
     )
@@ -20,6 +21,9 @@ value (MkPrice v) = v
 -- Return Left if input is not a decimal between 0.0 and 1000.00  
 create :: Double -> Either ErrorMsg Price
 create = createDecimal "Price" MkPrice 0.0 1000.0
+
+unsafeCreate :: Double -> Price
+unsafeCreate amount = MkPrice amount
 
 -- Create a Price from a decimal.
 -- Throw an exception if out of bounds. This should only be used if you know the value is valid.

@@ -229,31 +229,16 @@ toPricedOrderLine getProductPrice validatedOrderLine = do
         }
     Right $ ProductLine pricedLine
 
+-- add the special comment line if needed
 addCommentLine :: PricingMethod -> [PricedOrderLine] -> [PricedOrderLine]
 addCommentLine Standard lines = lines
 addCommentLine (Promotion (PromotionCode.MkPromotionCode promoCode)) lines =
     let appliedPromotion = ("Applied promotion " ++ promoCode) |> CommentLine
     in lines ++ [appliedPromotion]
 
-
--- // add the special comment line if needed
--- let addCommentLine pricingMethod lines =
---     match pricingMethod with
---     | Standard -> 
---         // unchanged
---         lines 
---     | Promotion (PromotionCode promoCode) ->  
---         let commentLine = 
---             sprintf "Applied promotion %s" promoCode 
---             |> CommentLine // lift to PricedOrderLine
---         List.append lines [commentLine]
-
--- let getLinePrice line =
---     match line with
---     | ProductLine line ->
---         line.LinePrice
---     | CommentLine _ ->
---         Price.unsafeCreate 0M
+getLinePrice :: PricedOrderLine -> Price
+getLinePrice (ProductLine line) = poplLinePrice line
+getLinePrice (CommentLine _) = Price.unsafeCreate 0
 
 -- let priceOrder : PriceOrder = 
 --     fun getPricingFunction validatedOrder ->
