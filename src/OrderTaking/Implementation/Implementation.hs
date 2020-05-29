@@ -8,6 +8,7 @@ module OrderTaking.Implementation.Implementation
     )
 where
 
+import           Flow
 import           Data.List                     as List
 import           Data.Either                   as Either
 import           Data.Either.Combinators
@@ -167,20 +168,20 @@ validateOrder
     -> UnvalidatedOrder
     -> Except.ExceptT ErrorMsg IO ValidatedOrder
 validateOrder checkProductCodeExists checkAddressExists unvalidatedOrder = do
-    orderId      <- (Except.liftEither . toOrderId . uoOrderId) unvalidatedOrder
-    customerInfo <- (Except.liftEither . toCustomerInfo . uoCustomerInfo) unvalidatedOrder
-    checkedShippingAddress <- (Except.ExceptT . (toCheckedAddress checkAddressExists) . uoShippingAddress) unvalidatedOrder
-    shippingAddress       <- Except.liftEither $ (toAddress checkedShippingAddress)
-    checkedBillingAddress <- (Except.ExceptT . (toCheckedAddress checkAddressExists) . uoBillingAddress) unvalidatedOrder
-    billingAddress <- Except.liftEither $ (toAddress checkedBillingAddress)
-    pricingMethod  <- (Except.return . Pricing.createPricingMethod . uoPromotionCode) unvalidatedOrder
+    orderId <- unvalidatedOrder |> uoOrderId |> toOrderId |> Except.liftEither
+    customerInfo <- unvalidatedOrder |> uoCustomerInfo |> toCustomerInfo |> Except.liftEither
+    checkedShippingAddress <- unvalidatedOrder |> uoShippingAddress |> (toCheckedAddress checkAddressExists) |> Except.ExceptT
+    shippingAddress <- checkedShippingAddress |> toAddress |> Except.liftEither
+    checkedBillingAddress <- unvalidatedOrder |> uoBillingAddress  |> (toCheckedAddress checkAddressExists) |> Except.ExceptT
+    billingAddress <- checkedBillingAddress |> toAddress |> Except.liftEither
+    pricingMethod <- unvalidatedOrder |> uoPromotionCode |> Pricing.createPricingMethod |> Except.return
     Except.return ValidatedOrder { voOrderId         = orderId
-                       , voCustomerInfo    = customerInfo
-                       , voShippingAddress = shippingAddress
-                       , voBillingAddress  = billingAddress
-                       , voLines           = [] -- lines
-                       , voPricingMethod   = pricingMethod
-                       }
+                                 , voCustomerInfo    = customerInfo
+                                 , voShippingAddress = shippingAddress
+                                 , voBillingAddress  = billingAddress
+                                 , voLines           = [] -- lines
+                                 , voPricingMethod   = pricingMethod
+                                 }
 
 -- // ---------------------------
 -- // PriceOrder step
