@@ -12,6 +12,7 @@ import           Flow
 import           Data.List                     as List
 import           Data.Either                   as Either
 import           Data.Either.Combinators
+import           Control.Monad                 as Monad
 import           Control.Monad.Except          as Except
 import           GHC.Base                      as Base
 import           OrderTaking.Common.Result
@@ -169,13 +170,34 @@ validateOrder
     -> Except.ExceptT ErrorMsg IO ValidatedOrder
 validateOrder checkProductCodeExists checkAddressExists unvalidatedOrder = do
     orderId <- unvalidatedOrder |> uoOrderId |> toOrderId |> Except.liftEither
-    customerInfo <- unvalidatedOrder |> uoCustomerInfo |> toCustomerInfo |> Except.liftEither
-    checkedShippingAddress <- unvalidatedOrder |> uoShippingAddress |> (toCheckedAddress checkAddressExists) |> Except.ExceptT
+    customerInfo <-
+        unvalidatedOrder
+        |> uoCustomerInfo
+        |> toCustomerInfo
+        |> Except.liftEither
+    checkedShippingAddress <-
+        unvalidatedOrder
+        |> uoShippingAddress
+        |> (toCheckedAddress checkAddressExists)
+        |> Except.ExceptT
     shippingAddress <- checkedShippingAddress |> toAddress |> Except.liftEither
-    checkedBillingAddress <- unvalidatedOrder |> uoBillingAddress  |> (toCheckedAddress checkAddressExists) |> Except.ExceptT
+    checkedBillingAddress <-
+        unvalidatedOrder
+        |> uoBillingAddress
+        |> (toCheckedAddress checkAddressExists)
+        |> Except.ExceptT
     billingAddress <- checkedBillingAddress |> toAddress |> Except.liftEither
-    lines <- unvalidatedOrder |> uoLines |> map (toValidatedOrderLine checkProductCodeExists) |> sequence
-    pricingMethod <- unvalidatedOrder |> uoPromotionCode |> Pricing.createPricingMethod |> Except.return
+    lines          <-
+        unvalidatedOrder
+        |> uoLines
+        |> (map (toValidatedOrderLine checkProductCodeExists))
+        |> Monad.sequence
+        |> Except.liftEither
+    pricingMethod <-
+        unvalidatedOrder
+        |> uoPromotionCode
+        |> Pricing.createPricingMethod
+        |> Except.return
     Except.return ValidatedOrder { voOrderId         = orderId
                                  , voCustomerInfo    = customerInfo
                                  , voShippingAddress = shippingAddress
