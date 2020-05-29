@@ -41,6 +41,8 @@ import qualified OrderTaking.Common.ProductCode
                                                as ProductCode
 import qualified OrderTaking.Common.OrderQuantity
                                                as OrderQuantity
+import qualified OrderTaking.Common.PromotionCode
+                                               as PromotionCode
 -- ======================================================
 -- This file contains the final implementation for the PlaceOrderWorkflow
 -- 
@@ -216,9 +218,9 @@ toPricedOrderLine
     -> ValidatedOrderLine
     -> Either PlaceOrderLeft PricedOrderLine
 toPricedOrderLine getProductPrice validatedOrderLine = do
-    qty        <- validatedOrderLine |> volQuantity |> OrderQuantity.value |> Right
-    price      <- validatedOrderLine |> volProductCode |> getProductPrice |> Right
-    linePrice  <- Price.multiply qty price |> mapLeft Pricing
+    qty <- validatedOrderLine |> volQuantity |> OrderQuantity.value |> Right
+    price <- validatedOrderLine |> volProductCode |> getProductPrice |> Right
+    linePrice <- Price.multiply qty price |> mapLeft Pricing
     pricedLine <- Right PricedOrderProductLine
         { poplOrderLineId = volOrderLineId validatedOrderLine
         , poplProductCode = volProductCode validatedOrderLine
@@ -227,10 +229,11 @@ toPricedOrderLine getProductPrice validatedOrderLine = do
         }
     Right $ ProductLine pricedLine
 
-addCommentLine :: PricingMethod -> [PricedOrderLine] -> PricedOrderLine
+addCommentLine :: PricingMethod -> [PricedOrderLine] -> [PricedOrderLine]
 addCommentLine Standard lines = lines
-addCommentLine Promotion (MkPromotionCode promoCode) lines = 
-    lines :: [("Applied promotion " ++ promoCode) |> CommentLine]
+addCommentLine (Promotion (PromotionCode.MkPromotionCode promoCode)) lines =
+    let appliedPromotion = ("Applied promotion " ++ promoCode) |> CommentLine
+    in lines ++ [appliedPromotion]
 
 
 -- // add the special comment line if needed
