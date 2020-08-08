@@ -420,36 +420,28 @@ createBillingEvent placedOrder
     }
     | otherwise = Nothing
 
---  helper to convert an Option into a List
--- let listOfOption opt =
---     match opt with 
---     | Some x -> [x]
---     | None -> []
+-- type CreateEvents
+--    =  PricedOrder                           -- input
+--    -> Maybe OrderAcknowledgmentSent    -- input (event from previous step)
+--    -> [PlaceOrderEvent]              -- output
 
--- let createEvents : CreateEvents = 
---     fun pricedOrder acknowledgmentEventOpt ->
---         let acknowledgmentEvents = 
---             acknowledgmentEventOpt 
---             |> Option.map PlaceOrderEvent.AcknowledgmentSent
---             |> listOfOption
---         let shippingEvents = 
---             pricedOrder
---             |> createShippingEvent
---             |> PlaceOrderEvent.ShippableOrderPlaced
---             |> List.singleton
---         let billingEvents = 
---             pricedOrder
---             |> createBillingEvent 
---             |> Option.map PlaceOrderEvent.BillableOrderPlaced
---             |> listOfOption
-
---         // return all the events
---         [
---         yield! acknowledgmentEvents
---         yield! shippingEvents 
---         yield! billingEvents
---         ]            
-
+createEvents :: CreateEvents
+createEvents pricedOrder maybeOrderAcknowledgmentSent =
+    let
+        acknowledgmentEvents = 
+            maybeOrderAcknowledgmentSent
+            |> fmap PoeAcknowledgmentSent
+        shippingEvents = 
+            pricedOrder
+            |> createShippingEvent
+            |> PoeShippableOrderPlaced
+            |> Just
+        billingEvents = 
+            pricedOrder
+            |> createBillingEvent 
+            |> fmap PoeBillableOrderPlaced
+    in
+        catMaybes [acknowledgmentEvents, shippingEvents, billingEvents]
 
 -- // ---------------------------
 -- // overall workflow
