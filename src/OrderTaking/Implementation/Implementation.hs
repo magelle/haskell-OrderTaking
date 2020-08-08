@@ -324,6 +324,24 @@ addShippingInfoToOrder calculateShippingCost pricedOrder =
 -- // VIP shipping step
 -- // ---------------------------
 
+vipStatus :: PricedOrderWithShippingMethod -> VipStatus
+vipStatus pricedOrder = 
+    pricedOrder
+    |> PricedOrderWithShippingMethod.powsiPricedOrder
+    |> PricedOrder.poCustomerInfo
+    |> CustomerInfo.vipStatus
+
+freeVipShipping :: FreeVipShipping
+freeVipShipping order = 
+    let updatedShippingInfo = case (vipStatus order) of
+            VipStatus.Normal -> PricedOrderWithShippingMethod.powsiShippingInfo order
+            VipStatus.Vip -> ShippingInfo {
+                    siShippingCost = Price.unsafeCreate  0.0
+                    , siShippingMethod = Fedex24
+                }
+    in
+        order where powsiShippingInfo = updatedShippingInfo
+
 --  Update the shipping cost if customer is VIP
 -- let freeVipShipping : FreeVipShipping =
 --     fun order -> 
