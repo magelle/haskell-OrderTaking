@@ -354,6 +354,34 @@ freeVipShipping order =
 -- // AcknowledgeOrder step
 -- // ---------------------------
 
+-- type AcknowledgeOrder
+--    =  CreateOrderAcknowledgmentLetter  -- dependency
+--    -> SendOrderAcknowledgment      -- dependency
+--    -> PricedOrderWithShippingMethod  -- input
+--    -> Maybe OrderAcknowledgmentSent -- output
+
+pricedOrderCustomerInfoEmailAddress :: PricedOrder -> EmailAddress
+pricedOrderCustomerInfoEmailAddress = emailAddress . poCustomerInfo
+
+acknoledgementResult :: SendResult -> PricedOrder -> Maybe OrderAcknowledgmentSent
+acknoledgementResult Sent pricedOrder = Some OrderAcknowledgmentSent {
+    oasOrderId = poOrderId pricedOrder
+    , oasEmailAddress = pricedOrderCustomerInfoEmailAddress pricedOrder
+    }
+acknoledgementResult NotSent _ = None
+
+acknowledgeOrder :: AcknowledgeOrder
+acknowledgeOrder createAcknowledgmentLetter sendAcknowledgment pricedOrderWithShipping =
+    let 
+        priedOrder = powsiPricedOrder pricedOrderWithShipping
+        letter = createAcknowledgmentLetter pricedOrderWithShipping
+        acknowledgment = OrderAcknowledgment {
+            oaEmailAddress = pricedOrderCustomerInfoEmailAddress pricedOrder
+            , oaLetter = letter
+            }
+        acknowledgmentSendingResult = sendAcknowledgment acknowledgment 
+    in acknoledgementResult acknowledgmentSendingResult
+
 -- let acknowledgeOrder : AcknowledgeOrder = 
 --     fun createAcknowledgmentLetter sendAcknowledgment pricedOrderWithShipping ->
 --         let pricedOrder = pricedOrderWithShipping.PricedOrder
