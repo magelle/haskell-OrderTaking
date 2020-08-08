@@ -281,37 +281,44 @@ priceOrder getPricingFunction validatedOrder =
 -- // Shipping step
 -- // ---------------------------
 
--- let (|UsLocalState|UsRemoteState|International|) (address:Address) = 
---     if address.Country |> String50.value = "US" then
---         match address.State |> UsStateCode.value  with
---         | "CA" | "OR" | "AZ" | "NV" -> 
---             UsLocalState
---         | _ -> 
---             UsRemoteState
---     else
---         International
+data ShippingDistance =
+    UsLocalState
+    | UsRemoteState
+    | International deriving (Eq, Show)
 
--- let calculateShippingCost : CalculateShippingCost =
---     fun pricedOrder ->
---         match pricedOrder.ShippingAddress with
---             | UsLocalState -> 5.0M
---             | UsRemoteState -> 10.0M
---             | International -> 20.0M
---         |> Price.unsafeCreate
+toShippingDistance :: Address -> ShippingDistance
+toShippingDistance address
+    | "US" == (address |> Address.country |> String50.value) =  
+        case UsStateCode.value (Address.state address) of
+           "CA" -> UsLocalState
+           "OR" -> UsLocalState
+           "AZ" -> UsLocalState
+           "NV" -> UsLocalState
+           _    -> UsRemoteState
+    | otherwise = International
 
--- let addShippingInfoToOrder : AddShippingInfoToOrder  =
---     fun calculateShippingCost pricedOrder ->
---         // create the shipping info
---         let shippingInfo = {
---             ShippingMethod = Fedex24
---             ShippingCost = calculateShippingCost pricedOrder 
---             }
 
---         // add it to the order
---         {
---         PricedOrder = pricedOrder
---         ShippingInfo = shippingInfo
---         }
+calculateShippingCost :: CalculateShippingCost
+calculateShippingCost pricedOrder = 
+    let 
+        shippingDistance = pricedOrder |> poShippingAddress |> toShippingDistance
+        shippingRate = case shippingDistance of
+            UsLocalState ->  5.0
+            UsRemoteState -> 10.0
+            International -> 20.0
+    in 
+        shippingRate |> Price.unsafeCreate
+
+
+addShippingInfoToOrder :: AddShippingInfoToOrder
+addShippingInfoToOrder calculateShippingCost pricedOrder = 
+    let 
+        shippingInfo = ShippingInfo Fedex24 (calculateShippingCost pricedOrder)
+    in 
+        PricedOrderWithShippingMethod {
+            powsiShippingInfo = shippingInfo
+            , powsiPricedOrder = pricedOrder
+        }
 
 -- // ---------------------------
 -- // VIP shipping step
