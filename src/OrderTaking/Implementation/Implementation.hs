@@ -244,6 +244,7 @@ getLinePrice :: PricedOrderLine -> Price
 getLinePrice (ProductLine line) = poplLinePrice line
 getLinePrice (CommentLine _   ) = Price.unsafeCreate 0
 
+-- Extracted out to get the right type
 validateLines :: GetPricingFunction -> ValidatedOrder -> Either PlaceOrderLeft [PricedOrderLine]
 validateLines getPricingFunction validatedOrder = 
     let getProductPrice = validatedOrder |> voPricingMethod |> getPricingFunction
@@ -253,6 +254,7 @@ validateLines getPricingFunction validatedOrder =
         |> Monad.sequence
         |> fmap (addCommentLine (voPricingMethod validatedOrder))
 
+-- Extracted out to get the right type
 sumAmountToBill :: [PricedOrderLine] -> Either PlaceOrderLeft BillingAmount.BillingAmount
 sumAmountToBill pricedOrderLines = 
     pricedOrderLines
