@@ -390,6 +390,13 @@ acknowledgeOrder createAcknowledgmentLetter sendAcknowledgment pricedOrderWithSh
 -- // Create events
 -- // ---------------------------
 
+makeShipmentLine :: PricedOrderLine -> Maybe ShippableOrderLine
+makeShipmentLine (ProductLine line) = Just ShippableOrderLine {
+        solProductCode = poplProductCode line
+        , solQuantity = poplQuantity line
+    }
+makeShipmentLine (CommentLine _) = None
+
 -- let makeShipmentLine (line: PricedOrderLine) : ShippableOrderLine option =
 --     match line with
 --     | ProductLine line ->
