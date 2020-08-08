@@ -324,39 +324,31 @@ addShippingInfoToOrder calculateShippingCost pricedOrder =
 -- // VIP shipping step
 -- // ---------------------------
 
-vipStatus :: PricedOrderWithShippingMethod -> VipStatus
-vipStatus pricedOrder = 
+pricedOrderWithShippingMethodVipStatus :: PricedOrderWithShippingMethod -> VipStatus.VipStatus
+pricedOrderWithShippingMethodVipStatus pricedOrder = 
     pricedOrder
-    |> PricedOrderWithShippingMethod.powsiPricedOrder
-    |> PricedOrder.poCustomerInfo
+    |> powsiPricedOrder
+    |> poCustomerInfo
     |> CustomerInfo.vipStatus
+
+updateShippingWithVipStatus :: VipStatus.VipStatus -> ShippingInfo -> ShippingInfo
+updateShippingWithVipStatus VipStatus.Normal shippingInfo = shippingInfo
+updateShippingWithVipStatus VipStatus.Vip shippingInfo = 
+    ShippingInfo {
+        siShippingCost = Price.unsafeCreate  0.0
+        , siShippingMethod = Fedex24
+    }
 
 freeVipShipping :: FreeVipShipping
 freeVipShipping order = 
-    let updatedShippingInfo = case (vipStatus order) of
-            VipStatus.Normal -> PricedOrderWithShippingMethod.powsiShippingInfo order
-            VipStatus.Vip -> ShippingInfo {
-                    siShippingCost = Price.unsafeCreate  0.0
-                    , siShippingMethod = Fedex24
-                }
+    let 
+        vipStatus = pricedOrderWithShippingMethodVipStatus order
+        updatedShippingInfo = updateShippingWithVipStatus vipStatus (powsiShippingInfo order)
     in
-        order where powsiShippingInfo = updatedShippingInfo
-
---  Update the shipping cost if customer is VIP
--- let freeVipShipping : FreeVipShipping =
---     fun order -> 
---         let updatedShippingInfo = 
---             match order.PricedOrder.CustomerInfo.VipStatus with
---             | Normal -> 
---                 // untouched
---                 order.ShippingInfo
---             | Vip -> 
---                 {order.ShippingInfo with 
---                     ShippingCost = Price.unsafeCreate 0.0M
---                     ShippingMethod = Fedex24 }
-
---         {order with ShippingInfo = updatedShippingInfo }
-
+        PricedOrderWithShippingMethod {
+            powsiPricedOrder = (powsiPricedOrder order)
+            , powsiShippingInfo = updatedShippingInfo
+        }
 
 -- // ---------------------------
 -- // AcknowledgeOrder step
