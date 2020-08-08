@@ -14,6 +14,7 @@ import           Data.List                     as List
 import           Data.Either                   as Either
 import           Data.Either.Combinators
 import           Data.Bifunctor
+import qualified Data.ByteString
 import           Control.Monad                 as Monad
 import           Control.Monad.Except          as Except
 import           GHC.Base                      as Base
@@ -48,6 +49,7 @@ import qualified OrderTaking.Common.PromotionCode
 
 import qualified OrderTaking.Common.BillingAmount
                                                as BillingAmount 
+import qualified OrderTaking.Common.PdfAttachment as PdfAttachment
 -- ======================================================
 -- This file contains the final implementation for the PlaceOrderWorkflow
 -- 
@@ -395,41 +397,28 @@ makeShipmentLine (ProductLine line) = Just ShippableOrderLine {
         solProductCode = poplProductCode line
         , solQuantity = poplQuantity line
     }
-makeShipmentLine (CommentLine _) = None
-
--- let makeShipmentLine (line: PricedOrderLine) : ShippableOrderLine option =
---     match line with
---     | ProductLine line ->
---         {
---         ProductCode = line.ProductCode
---         Quantity = line.Quantity
---         } |> Some
---     | CommentLine _ ->
---         None
+makeShipmentLine (CommentLine _) = Nothing
 
 
--- let createShippingEvent (placedOrder:PricedOrder) : ShippableOrderPlaced =
---     {
---     OrderId = placedOrder.OrderId
---     ShippingAddress = placedOrder.ShippingAddress
---     ShipmentLines = placedOrder.Lines |> List.choose makeShipmentLine
---     Pdf = 
---         { 
---         Name = sprintf "Order%s.pdf" (placedOrder.OrderId |> OrderId.value)
---         Bytes = [||]
---         }
---     } 
+createShippingEvent :: PricedOrder -> ShippableOrderPlaced
+createShippingEvent placedOrder = ShippableOrderPlaced {
+        spoOrderId = poOrderId placedOrder
+        , spoShippingAddress = poShippingAddress placedOrder
+        , spoShipmentLines = placedOrder |> poLines |> mapMaybe makeShipmentLine
+        , spoPdf = PdfAttachment.MkPdfAttachment {
+            PdfAttachment.name = "Order" ++ (placedOrder |> poOrderId |> OrderId.value) ++ ".pdf"
+            , PdfAttachment.bytes = Data.ByteString.empty
+        }
+    }
 
--- let createBillingEvent (placedOrder:PricedOrder) : BillableOrderPlaced option =
---     let billingAmount = placedOrder.AmountToBill |> BillingAmount.value
---     if billingAmount > 0M then
---         {
---         OrderId = placedOrder.OrderId
---         BillingAddress = placedOrder.BillingAddress
---         AmountToBill = placedOrder.AmountToBill 
---         } |> Some
---     else
---         None
+createBillingEvent :: PricedOrder -> Maybe BillableOrderPlaced
+createBillingEvent placedOrder
+    | (placedOrder |> poAmountToBill |> BillingAmount.value) > 0 = Just BillableOrderPlaced {
+        bopOrderId = poOrderId placedOrder
+        , bopBillingAddress = poBillingAddress placedOrder
+        , bopAmountToBill = poAmountToBill placedOrder
+    }
+    | otherwise = Nothing
 
 --  helper to convert an Option into a List
 -- let listOfOption opt =
