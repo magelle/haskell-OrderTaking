@@ -9,6 +9,7 @@ module OrderTaking.Implementation.Implementation
 where
 
 import           Flow
+import           Data.Maybe
 import           Data.List                     as List
 import           Data.Either                   as Either
 import           Data.Either.Combinators
@@ -360,50 +361,30 @@ freeVipShipping order =
 --    -> PricedOrderWithShippingMethod  -- input
 --    -> Maybe OrderAcknowledgmentSent -- output
 
-pricedOrderCustomerInfoEmailAddress :: PricedOrder -> EmailAddress
+pricedOrderCustomerInfoEmailAddress :: PricedOrder -> EmailAddress.EmailAddress
 pricedOrderCustomerInfoEmailAddress = emailAddress . poCustomerInfo
 
-acknoledgementResult :: SendResult -> PricedOrder -> Maybe OrderAcknowledgmentSent
-acknoledgementResult Sent pricedOrder = Some OrderAcknowledgmentSent {
+--         // if the acknowledgement was successfully sent,
+--         // return the corresponding event, else return None
+acknowledgementResult :: SendResult -> PricedOrder -> Maybe OrderAcknowledgmentSent
+acknowledgementResult Sent pricedOrder = Just OrderAcknowledgmentSent {
     oasOrderId = poOrderId pricedOrder
     , oasEmailAddress = pricedOrderCustomerInfoEmailAddress pricedOrder
     }
-acknoledgementResult NotSent _ = None
+acknowledgementResult NotSent _ = Nothing
 
 acknowledgeOrder :: AcknowledgeOrder
 acknowledgeOrder createAcknowledgmentLetter sendAcknowledgment pricedOrderWithShipping =
     let 
-        priedOrder = powsiPricedOrder pricedOrderWithShipping
+        pricedOrder = powsiPricedOrder pricedOrderWithShipping
         letter = createAcknowledgmentLetter pricedOrderWithShipping
         acknowledgment = OrderAcknowledgment {
             oaEmailAddress = pricedOrderCustomerInfoEmailAddress pricedOrder
             , oaLetter = letter
             }
         acknowledgmentSendingResult = sendAcknowledgment acknowledgment 
-    in acknoledgementResult acknowledgmentSendingResult
-
--- let acknowledgeOrder : AcknowledgeOrder = 
---     fun createAcknowledgmentLetter sendAcknowledgment pricedOrderWithShipping ->
---         let pricedOrder = pricedOrderWithShipping.PricedOrder
-
---         let letter = createAcknowledgmentLetter pricedOrderWithShipping
---         let acknowledgment = {
---             EmailAddress = pricedOrder.CustomerInfo.EmailAddress
---             Letter = letter 
---             }
-
-
---         // if the acknowledgement was successfully sent,
---         // return the corresponding event, else return None
---         match sendAcknowledgment acknowledgment with
---         | Sent -> 
---             let event = {
---                 OrderId = pricedOrder.OrderId
---                 EmailAddress = pricedOrder.CustomerInfo.EmailAddress
---                 } 
---             Some event
---         | NotSent ->
---             None
+    in 
+        acknowledgementResult acknowledgmentSendingResult pricedOrder
 
 -- // ---------------------------
 -- // Create events
