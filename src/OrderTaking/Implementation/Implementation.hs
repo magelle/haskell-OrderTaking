@@ -12,6 +12,7 @@ import           Flow
 import           Data.List                     as List
 import           Data.Either                   as Either
 import           Data.Either.Combinators
+import           Data.Bifunctor
 import           Control.Monad                 as Monad
 import           Control.Monad.Except          as Except
 import           GHC.Base                      as Base
@@ -43,6 +44,9 @@ import qualified OrderTaking.Common.OrderQuantity
                                                as OrderQuantity
 import qualified OrderTaking.Common.PromotionCode
                                                as PromotionCode
+
+import qualified OrderTaking.Common.BillingAmount
+                                               as BillingAmount 
 -- ======================================================
 -- This file contains the final implementation for the PlaceOrderWorkflow
 -- 
@@ -234,41 +238,42 @@ addCommentLine :: PricingMethod -> [PricedOrderLine] -> [PricedOrderLine]
 addCommentLine Standard lines = lines
 addCommentLine (Promotion (PromotionCode.MkPromotionCode promoCode)) lines =
     let appliedPromotion = ("Applied promotion " ++ promoCode) |> CommentLine
-    in lines ++ [appliedPromotion]
+    in  lines ++ [appliedPromotion]
 
 getLinePrice :: PricedOrderLine -> Price
 getLinePrice (ProductLine line) = poplLinePrice line
-getLinePrice (CommentLine _) = Price.unsafeCreate 0
+getLinePrice (CommentLine _   ) = Price.unsafeCreate 0
 
--- let priceOrder : PriceOrder = 
---     fun getPricingFunction validatedOrder ->
---         let getProductPrice = getPricingFunction validatedOrder.PricingMethod
---         result {
---             let! lines = 
---                 validatedOrder.Lines 
---                 |> List.map (toPricedOrderLine getProductPrice) 
---                 |> Result.sequence // convert list of Results to a single Result
---                 |> Result.map (fun lines ->
---                     lines |> addCommentLine validatedOrder.PricingMethod 
---                     )
+validateLines :: GetPricingFunction -> ValidatedOrder -> Either PlaceOrderLeft [PricedOrderLine]
+validateLines getPricingFunction validatedOrder = 
+    let getProductPrice = validatedOrder |> voPricingMethod |> getPricingFunction
+    in validatedOrder
+        |> voLines
+        |> map (toPricedOrderLine getProductPrice)
+        |> Monad.sequence
+        |> fmap (addCommentLine (voPricingMethod validatedOrder))
 
---             let! amountToBill = 
---                 lines 
---                 |> List.map getLinePrice                   // get each line price
---                 |> BillingAmount.sumPrices                // add them together as a BillingAmount
---                 |> Result.mapLeft PricingLeft           // convert to PlaceOrderLeft
---             let pricedOrder : PricedOrder = {
---                 OrderId  = validatedOrder.OrderId 
---                 CustomerInfo = validatedOrder.CustomerInfo 
---                 ShippingAddress = validatedOrder.ShippingAddress 
---                 BillingAddress = validatedOrder.BillingAddress  
---                 Lines = lines 
---                 AmountToBill = amountToBill 
---                 PricingMethod = validatedOrder.PricingMethod 
---             }
---             return pricedOrder 
---         }
+sumAmountToBill :: [PricedOrderLine] -> Either PlaceOrderLeft BillingAmount.BillingAmount
+sumAmountToBill pricedOrderLines = 
+    pricedOrderLines
+        |> (map getLinePrice)
+        |> BillingAmount.sumPrices
+        |> (first Pricing)
 
+priceOrder :: GetPricingFunction -> ValidatedOrder -> Either PlaceOrderLeft PricedOrder
+priceOrder getPricingFunction validatedOrder =
+    do
+        lines <-validateLines getPricingFunction validatedOrder 
+        amountToBill <- sumAmountToBill lines
+        Right PricedOrder {
+            poOrderId = voOrderId validatedOrder
+            , poCustomerInfo = voCustomerInfo validatedOrder
+            , poShippingAddress = voShippingAddress validatedOrder
+            , poBillingAddress = voBillingAddress validatedOrder 
+            , poAmountToBill = amountToBill
+            , poLines = lines
+            , poPricingMethod = voPricingMethod validatedOrder
+        }
 
 -- // ---------------------------
 -- // Shipping step
